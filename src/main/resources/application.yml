@@ -1,0 +1,16 @@
+# 应用服务 WEB 访问端口
+spring:
+  application:
+    name: ai-code-helper
+  profiles:
+    active: local
+server:
+  port: 8080
+
+
+langChain4j:
+  community:
+    dashscope:
+      chat-model:
+        model-name: qwen-max
+        api-key: sk-ws-H.EHREEMP.neqN.MEYCIQCSyAzgBWhQshINq3raYnBmpM_8rYNzSVqGTBDg0yPt5QIhAL_alhFeVL5dd5kEbyflPd4AzWvAUsgvtknQmd-7uI6l
