@@ -26,4 +26,11 @@ class AiCodeHelperServiceTest {
         System.out.println(result2);
     }
 
+    @Test
+    void chatForRecord() {
+
+        String userMessage = "你好，我是Jim，帮我制定学习报告";
+        AiCodeHelperService.Record result = aiCodeHelperService.ChatForRecord(userMessage);
+        System.out.println(result);
+    }
 }
