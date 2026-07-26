@@ -23,6 +23,9 @@ class AiCodeHelperApplicationTests {
     @Test
     void chat() {
         System.out.println(aiCodeHelper.Chat("你好, 这里是程序员Jim"));
+        // 结果与chatWithMemory做对比，这里是没有会话记忆无法得知我身份的
+        String result2 = aiCodeHelper.Chat("你好，我是谁？");
+        System.out.println(result2);
     }
 
 
