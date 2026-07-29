@@ -1,6 +1,7 @@
 package com.example.aicodehelper.ai;
 
 import com.example.aicodehelper.ai.rag.RagConfig;
+import com.example.aicodehelper.ai.tools.MathTools;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
@@ -29,6 +30,7 @@ public class AiCodeHelperFactory
                 .chatModel(qwenChatModel)
                 .chatMemory(chatMemory) // 会话记忆
                 .contentRetriever(contentRetriever)
+                .tools(new MathTools())
                 .build();
 
         return aiServices;

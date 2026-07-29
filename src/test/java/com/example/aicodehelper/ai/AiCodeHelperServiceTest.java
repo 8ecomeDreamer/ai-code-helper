@@ -52,4 +52,12 @@ class AiCodeHelperServiceTest {
         System.out.println(userMessage.sources());
         System.out.println(userMessage.content());
     }
+
+    @Test
+    void testChatTools() {
+        // 1.测试rag结果
+        String userMessage = aiCodeHelperService.Chat("What is the square root of 475695037565?");
+        // 2.输出
+        System.out.println(userMessage);
+    }
 }
