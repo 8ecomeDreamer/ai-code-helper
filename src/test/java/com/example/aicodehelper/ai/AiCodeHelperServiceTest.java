@@ -1,5 +1,6 @@
 package com.example.aicodehelper.ai;
 
+import dev.langchain4j.service.Result;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,5 +42,14 @@ class AiCodeHelperServiceTest {
         String userMessage = aiCodeHelperService.Chat("JAVA路线");
         // 2.输出
         System.out.println(userMessage);
+    }
+
+    @Test
+    void testChatRagResult() {
+        // 1.测试rag结果
+        Result<String> userMessage = aiCodeHelperService.ChatWithRagResult("JAVA路线");
+        // 2.输出
+        System.out.println(userMessage.sources());
+        System.out.println(userMessage.content());
     }
 }
