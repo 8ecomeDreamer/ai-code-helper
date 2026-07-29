@@ -33,4 +33,13 @@ class AiCodeHelperServiceTest {
         AiCodeHelperService.Record result = aiCodeHelperService.ChatForRecord(userMessage);
         System.out.println(result);
     }
+
+
+    @Test
+    void testChatRag() {
+        // 1.测试rag结果
+        String userMessage = aiCodeHelperService.Chat("JAVA路线");
+        // 2.输出
+        System.out.println(userMessage);
+    }
 }

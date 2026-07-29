@@ -1,8 +1,10 @@
 package com.example.aicodehelper.ai;
 
+import com.example.aicodehelper.ai.rag.RagConfig;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,9 @@ public class AiCodeHelperFactory
     @Resource
     private ChatModel qwenChatModel;
 
+    @Resource
+    private ContentRetriever contentRetriever;
+
     @Bean
     public AiCodeHelperService aiCodeHelperService() {
         // 会话记忆
@@ -23,10 +28,9 @@ public class AiCodeHelperFactory
         AiCodeHelperService aiServices = AiServices.builder(AiCodeHelperService.class)
                 .chatModel(qwenChatModel)
                 .chatMemory(chatMemory) // 会话记忆
+                .contentRetriever(contentRetriever)
                 .build();
 
         return aiServices;
-
-//                .create(AiCodeHelperService.class, qwenChatModel);
     }
 }

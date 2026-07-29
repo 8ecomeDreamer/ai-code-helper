@@ -1,6 +1,7 @@
 package com.example.aicodehelper;
 
 import com.example.aicodehelper.ai.AiCodeHelper;
+import com.example.aicodehelper.ai.AiCodeHelperService;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
@@ -39,4 +40,6 @@ class AiCodeHelperApplicationTests {
         // 2.调用chat方法
         aiCodeHelper.Chat(userMessage);
     }
+
+
 }
