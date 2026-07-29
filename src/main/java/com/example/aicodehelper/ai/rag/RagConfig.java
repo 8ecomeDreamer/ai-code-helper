@@ -14,6 +14,8 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class RagConfig {
 
@@ -36,6 +38,7 @@ public class RagConfig {
 
         // 1. 加载文档
         Document document = FileSystemDocumentLoader.loadDocument("D:\\study\\github\\ai-code-helper\\ai-code-helper\\src\\main\\resources\\docs\\Java_AI应⽤开发学习路线26 年最新零基础到精通⼀条⻰.md");
+//        List<Document> documents = FileSystemDocumentLoader.loadDocuments("src\\main\\resources\\docs");
         // 2. 切割文档,每个文档按照段落进行切割。每次最多切割1000字符，最多可重叠200字符。
         DocumentByParagraphSplitter documentByParagraphSplitter = new DocumentByParagraphSplitter(1000, 200);
         // 3. 转换成向量模型并存储到向量数据中
