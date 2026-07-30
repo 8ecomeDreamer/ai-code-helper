@@ -3,6 +3,7 @@ package com.example.aicodehelper.ai;
 import com.example.aicodehelper.ai.mcp.McpConfig;
 import com.example.aicodehelper.ai.rag.RagConfig;
 import com.example.aicodehelper.ai.tools.MathTools;
+import dev.langchain4j.guardrail.InputGuardrail;
 import dev.langchain4j.mcp.McpToolProvider;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -27,6 +28,9 @@ public class AiCodeHelperFactory
     @Resource
     private McpToolProvider mcpToolProvider;
 
+    @Resource
+    private InputGuardrail inputGuardrail;
+
     @Bean
     public AiCodeHelperService aiCodeHelperService() {
         // 会话记忆
@@ -38,6 +42,7 @@ public class AiCodeHelperFactory
                 .contentRetriever(contentRetriever)
                 .tools(new MathTools())
                 .toolProvider(mcpToolProvider)
+                .inputGuardrails(inputGuardrail)
                 .build();
 
         return aiServices;

@@ -68,4 +68,12 @@ class AiCodeHelperServiceTest {
         // 2.输出
         System.out.println(userMessage);
     }
+
+    @Test
+    void chatGuardRails() {
+        // 1.测试rag结果
+        String userMessage = aiCodeHelperService.Chat("SB");
+        // 2.输出
+        System.out.println(userMessage);
+    }
 }
