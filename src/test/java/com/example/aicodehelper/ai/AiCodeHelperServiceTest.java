@@ -60,4 +60,12 @@ class AiCodeHelperServiceTest {
         // 2.输出
         System.out.println(userMessage);
     }
+
+    @Test
+    void chatMCP() {
+        // 1.测试rag结果
+        String userMessage = aiCodeHelperService.Chat("顺德怎么去？");
+        // 2.输出
+        System.out.println(userMessage);
+    }
 }
