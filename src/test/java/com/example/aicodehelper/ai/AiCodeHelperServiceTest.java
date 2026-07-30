@@ -71,8 +71,16 @@ class AiCodeHelperServiceTest {
 
     @Test
     void chatGuardRails() {
-        // 1.测试rag结果
+        // 1.测试GuardRails
 //        String userMessage = aiCodeHelperService.Chat("SB");
+        String userMessage = aiCodeHelperService.Chat("Hi");
+        // 2.输出
+        System.out.println(userMessage);
+    }
+
+    @Test
+    void chatWithListeners() {
+        // 1.测试Listener
         String userMessage = aiCodeHelperService.Chat("Hi");
         // 2.输出
         System.out.println(userMessage);

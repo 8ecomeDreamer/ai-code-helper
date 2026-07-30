@@ -19,7 +19,8 @@ public class AiCodeHelperFactory
 {
 
     @Resource
-    private ChatModel qwenChatModel;
+    private ChatModel myQwenChatModel; // 这个chatModel携带了监听器，相当于仿制了一个chatModel
+//    private ChatModel qwenChatModel;
 
     @Resource
     private ContentRetriever contentRetriever;
@@ -37,7 +38,7 @@ public class AiCodeHelperFactory
         ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
         // 构建AI服务
         AiCodeHelperService aiServices = AiServices.builder(AiCodeHelperService.class)
-                .chatModel(qwenChatModel)
+                .chatModel(myQwenChatModel)
                 .chatMemory(chatMemory) // 会话记忆
                 .contentRetriever(contentRetriever)
                 .tools(new MathTools())
