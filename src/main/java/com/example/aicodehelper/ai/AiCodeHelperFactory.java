@@ -42,7 +42,7 @@ public class AiCodeHelperFactory
                 .chatMemory(chatMemory) // 会话记忆
                 .contentRetriever(contentRetriever)
                 .tools(new MathTools())
-                .toolProvider(mcpToolProvider)
+                .toolProvider(mcpToolProvider != null ? mcpToolProvider : null)
                 .inputGuardrails(inputGuardrail)
                 .build();
 
