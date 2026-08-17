@@ -1,31 +1,19 @@
 package com.example.aicodehelper.config;
 
-import org.apache.catalina.filters.CorsFilter;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class GlobalCorsConfig {
-    @Bean
-    public CorsFilter corsFilter() {
-        //1. 添加 CORS配置信息
-        CorsConfiguration config = new CorsConfiguration();
-        //放行哪些原始域
-        config.addAllowedOrigin("*");
-        //是否发送 Cookie
-        config.setAllowCredentials(true);
-        //放行哪些请求方式
-        config.addAllowedMethod("*");
-        //放行哪些原始请求头部信息
-        config.addAllowedHeader("*");
-        //暴露哪些头部信息
-        config.addExposedHeader("*");
-        //2. 添加映射路径
-        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        corsConfigurationSource.registerCorsConfiguration("/**",config);
-        //3. 返回新的CorsFilter
-        return new CorsFilter();
+public class GlobalCorsConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**") // 所有路径
+                .allowedOrigins("http://localhost:3000") // 允许的源
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 允许的请求方法
+                .allowedHeaders("*") // 允许的请求头
+                .exposedHeaders("Authorization", "X-Custom-Header") // 暴露的响应头
+                .allowCredentials(true) // 允许携带凭证
+                .maxAge(3600); // 预检请求缓存时间（单位：秒）
     }
 }
