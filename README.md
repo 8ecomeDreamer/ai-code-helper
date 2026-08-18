@@ -107,13 +107,13 @@ java -jar target/ai-code-helper-0.0.1-SNAPSHOT.jar
 
 表格
 
-| 问题类型 | 解决方案 |
-| --- | --- |
-| 🔴 JDK 版本报错 | 确保 pom.xml 中 `maven.compiler.source` / `target` 设置为 21 |
-| 📄 PDF 加载失败 (FileSystemDocumentLoader) | 使用绝对路径测试；文件名避免中文、空格、特殊符号；路径基准为项目根目录 |
-| 🧱 Jar 包打包后无法运行 | 删除 `spring-boot-maven-plugin` 插件中的 `<skip>true</skip>` |
-| 🔒 安全护栏未生效 | 自定义 `SafeInputGuardrail` 需要手动注册注入到 AiService |
-| ☁️ 微信云托管读不到 Api‑Key | 环境变量名大写 + 下划线；修改环境变量后**必须重新发布新版本**；SpringBoot 生产端口改为 80 |
+| 问题类型 | 解决方案                                                             |
+| --- |------------------------------------------------------------------|
+| 🔴 JDK 版本报错 | 确保 pom.xml 中 `maven.compiler.source` / `target` 设置为 21           |
+| 📄 PDF 加载失败 (FileSystemDocumentLoader) | 使用绝对路径测试；文件名避免中文、空格、特殊符号；路径基准为项目根目录                              |
+| 🧱 Jar 包打包后无法运行 | 删除 `spring-boot-maven-plugin` 插件中的 `<skip>true</skip>`           |
+| 🔒 安全护栏未生效 | 自定义 `SafeInputGuardrail` 需要手动注册注入到 AiService                     |
+| ☁️ 微信云托管读不到 Api‑Key | 环境变量名大写 + 下划线；修改环境变量后**必须重新发布新版本**；SpringBoot 生产端口需要与云平台设置端口对应一致 |
 
 ## 📚 学习资源
 
