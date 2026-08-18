@@ -1,19 +1,24 @@
-# Docker 镜像构建
-# @author <a href="https://github.com/liyupi">程序员鱼皮</a>
-# @from <a href="https://yupi.icu">编程导航知识星球</a>
-# 选择基础镜像
-FROM maven:3.8.1-jdk-8-slim as builder
-
-# 解决容器时期与真实时间相差 8 小时的问题
-RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
-
-# 复制代码到容器内
+# ---------------------- 构建阶段 ----------------------
+FROM maven:3.9.8-eclipse-temurin-21 AS builder
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
 
-# 打包构建
+# 优先复制pom.xml，缓存依赖层（加速构建）
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# 复制全部源码
+COPY src ./src
+COPY settings.xml /root/.m2/settings.xml
+
+# 打包跳过测试
 RUN mvn package -DskipTests
 
-# 容器启动时运行 jar 包
-CMD ["java","-jar","/app/target/yudada-backend-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]
+# ---------------------- 运行阶段（最终镜像） ----------------------
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+# 从构建阶段拷贝打好的jar包
+COPY --from=builder /app/target/*.jar app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
