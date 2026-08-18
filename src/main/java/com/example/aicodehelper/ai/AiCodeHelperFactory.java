@@ -40,8 +40,8 @@ public class AiCodeHelperFactory
     public AiCodeHelperService aiCodeHelperService() {
         // 会话记忆
         ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
-        // 构建AI服务
 
+        // 构建AI服务
         return AiServices.builder(AiCodeHelperService.class)
                 .chatModel(myQwenChatModel)
                 .streamingChatModel(qwenStreamingChatModel) // 流式输出
