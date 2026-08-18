@@ -20,5 +20,5 @@ WORKDIR /app
 # 从构建阶段拷贝打好的jar包
 COPY --from=builder /app/target/ai-code-helper-0.0.1-SNAPSHOT.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java","-jar","app.jar"]
