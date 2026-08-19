@@ -15,7 +15,7 @@ langChain4j:
         model-name: qwen-max
         api-key:  ${LANGCHAIN4J_API_KEY}
       embedding-model:
-        model-name: text-embedding-v3 # 经济情况良好也可选择 text-embedding-v4，免费额度有 qwen3.7-text-embedding text-embedding-v1 text-embedding-v2 text-embedding-v3
+        model-name: text-embedding-async-v1 # 经济情况良好也可选择 text-embedding-v4，免费额度有 qwen3.7-text-embedding text-embedding-v1 text-embedding-v2 text-embedding-v3
         api-key:  ${LANGCHAIN4J_API_KEY}
       streaming-chat-model:
         model-name: qwen-max

@@ -36,12 +36,12 @@ public class RagConfig {
         // EmbeddingStore无法使用Resource注入，好像是报找不到bean? 从官网上找到创建实例代替
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-        // 1. 加载文档
-        ClassPathResource resource = new ClassPathResource("docs/Java_AI应用开发学习路线.md");
-        Document document;
-        try (var inputStream = resource.getInputStream()) {
-            document = new TextDocumentParser().parse(inputStream);
-        }
+//        // 1. 加载文档
+//        ClassPathResource resource = new ClassPathResource("docs/Java_AI应用开发学习路线.md");
+//        Document document;
+//        try (var inputStream = resource.getInputStream()) {
+//            document = new TextDocumentParser().parse(inputStream);
+//        }
 
 //        Document document = FileSystemDocumentLoader.loadDocument("D:\\study\\github\\ai-code-helper\\ai-code-helper\\src\\main\\resources\\docs\\Java_AI应用开发学习路线.md");
 //        List<Document> documents = FileSystemDocumentLoader.loadDocuments("src\\main\\resources\\docs");
@@ -58,7 +58,7 @@ public class RagConfig {
                 .build();
 
         // 加载文档
-        ingestor.ingest(document);
+//        ingestor.ingest(document);
         // 4.自定义内容加载器
         EmbeddingStoreContentRetriever contentRetriver = EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(embeddingStore)
