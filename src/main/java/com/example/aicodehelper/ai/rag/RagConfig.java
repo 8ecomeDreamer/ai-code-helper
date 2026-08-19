@@ -1,7 +1,7 @@
 package com.example.aicodehelper.ai.rag;
 
 import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
+import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentByParagraphSplitter;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -13,8 +13,9 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 
-import java.util.List;
+import java.io.IOException;
 
 @Configuration
 public class RagConfig {
@@ -26,7 +27,7 @@ public class RagConfig {
 //    private EmbeddingStore<TextSegment> embeddingStore;
 
     @Bean
-    public ContentRetriever contentRetriever() {
+    public ContentRetriever contentRetriever() throws IOException {
         // 需求：切割文档
 
         // 引入EmbeddingModel和EmbeddingStore
@@ -35,9 +36,14 @@ public class RagConfig {
         // EmbeddingStore无法使用Resource注入，好像是报找不到bean? 从官网上找到创建实例代替
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
-
         // 1. 加载文档
-        Document document = FileSystemDocumentLoader.loadDocument("D:\\study\\github\\ai-code-helper\\ai-code-helper\\src\\main\\resources\\docs\\Java_AI应⽤开发学习路线26 年最新零基础到精通⼀条⻰.md");
+        ClassPathResource resource = new ClassPathResource("docs/Java_AI应用开发学习路线.md");
+        Document document;
+        try (var inputStream = resource.getInputStream()) {
+            document = new TextDocumentParser().parse(inputStream);
+        }
+
+//        Document document = FileSystemDocumentLoader.loadDocument("D:\\study\\github\\ai-code-helper\\ai-code-helper\\src\\main\\resources\\docs\\Java_AI应用开发学习路线.md");
 //        List<Document> documents = FileSystemDocumentLoader.loadDocuments("src\\main\\resources\\docs");
         // 2. 切割文档,每个文档按照段落进行切割。每次最多切割1000字符，最多可重叠200字符。
         DocumentByParagraphSplitter documentByParagraphSplitter = new DocumentByParagraphSplitter(1000, 200);
