@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/ai")
-public class aiController {
+public class AiController {
 
 
     @Resource
