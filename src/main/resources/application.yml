@@ -2,8 +2,8 @@
 spring:
   application:
     name: ai-code-helper
-#  profiles:
-#    active: prod
+  profiles:
+    active: prod
 server:
   port: 8081
   servlet:
