@@ -47,7 +47,7 @@ public class AiCodeHelperFactory
                 .streamingChatModel(qwenStreamingChatModel) // 流式输出
                 .chatMemory(chatMemory) // 会话记忆
                 .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10)) // 每个会话独立存储
-//                .contentRetriever(contentRetriever) // Rag检索生成
+                .contentRetriever(contentRetriever) // Rag检索生成
                 .tools(new MathTools()) // 工具调用
                 .toolProvider(mcpToolProvider) // mcp工具调用
                 .inputGuardrails(inputGuardrail)

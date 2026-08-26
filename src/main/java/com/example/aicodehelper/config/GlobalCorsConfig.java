@@ -9,7 +9,10 @@ public class GlobalCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 所有路径
-                .allowedOrigins("http://localhost:3000") // 允许的源
+                .allowedOrigins("http://localhost:8081",
+                        "http://192.168.1.12:3000",
+                        "http://localhost:3000",
+                        "https://ai-code-helper-298355-11-1306843231.sh.run.tcloudbase.com") // 允许的源
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 允许的请求方法
                 .allowedHeaders("*") // 允许的请求头
                 .exposedHeaders("Authorization", "X-Custom-Header") // 暴露的响应头
