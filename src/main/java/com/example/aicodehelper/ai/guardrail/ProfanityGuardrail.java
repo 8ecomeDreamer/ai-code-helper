@@ -1,4 +1,4 @@
-package com.example.aicodehelper.ai.guardrails;
+package com.example.aicodehelper.ai.guardrail;
 
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.guardrail.*;
