@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aicodehelper.mapper.SysRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.aicodehelper.domain.SysRole">
+            <id property="role_id" column="role_id" />
+            <result property="role_name" column="role_name" />
+            <result property="role_key" column="role_key" />
+            <result property="role_sort" column="role_sort" />
+            <result property="data_scope" column="data_scope" />
+            <result property="menu_check_strictly" column="menu_check_strictly" />
+            <result property="dept_check_strictly" column="dept_check_strictly" />
+            <result property="status" column="status" />
+            <result property="del_flag" column="del_flag" />
+            <result property="create_by" column="create_by" />
+            <result property="create_time" column="create_time" />
+            <result property="update_by" column="update_by" />
+            <result property="update_time" column="update_time" />
+            <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        role_id,role_name,role_key,role_sort,data_scope,menu_check_strictly,
+        dept_check_strictly,status,del_flag,create_by,create_time,
+        update_by,update_time,remark
+    </sql>
+</mapper>
