@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aicodehelper.mapper.SysMenuMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.aicodehelper.domain.SysMenu">
+            <id property="menu_id" column="menu_id" />
+            <result property="menu_name" column="menu_name" />
+            <result property="parent_id" column="parent_id" />
+            <result property="order_num" column="order_num" />
+            <result property="path" column="path" />
+            <result property="component" column="component" />
+            <result property="query" column="query" />
+            <result property="route_name" column="route_name" />
+            <result property="is_frame" column="is_frame" />
+            <result property="is_cache" column="is_cache" />
+            <result property="menu_type" column="menu_type" />
+            <result property="visible" column="visible" />
+            <result property="status" column="status" />
+            <result property="perms" column="perms" />
+            <result property="icon" column="icon" />
+            <result property="create_by" column="create_by" />
+            <result property="create_time" column="create_time" />
+            <result property="update_by" column="update_by" />
+            <result property="update_time" column="update_time" />
+            <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        menu_id,menu_name,parent_id,order_num,path,component,
+        query,route_name,is_frame,is_cache,menu_type,
+        visible,status,perms,icon,create_by,
+        create_time,update_by,update_time,remark
+    </sql>
+</mapper>
