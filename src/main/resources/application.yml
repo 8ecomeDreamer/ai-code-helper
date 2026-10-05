@@ -10,5 +10,16 @@ server:
   servlet:
     context-path: /api
 
+# MyBatis-Plus 配置（实体为生成器 snake_case 字段风格，关闭驼峰映射）
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml,classpath*:/generator/mapper/**/*.xml
+  type-aliases-package: com.example.aicodehelper.domain
+  configuration:
+    map-underscore-to-camel-case: false
 
-
+# JWT 令牌配置
+token:
+  header: Authorization
+  prefix: "Bearer "
+  secret: ${TOKEN_SECRET:ai-code-helper-textile-agent-jwt-secret-key-2026}
+  expire-minutes: 720
