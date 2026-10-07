@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aicodehelper.mapper.AiPromptTemplateMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.aicodehelper.domain.AiPromptTemplate">
+            <id property="id" column="id" />
+            <result property="template_name" column="template_name" />
+            <result property="agent_name" column="agent_name" />
+            <result property="prompt_type" column="prompt_type" />
+            <result property="content" column="content" />
+            <result property="model_id" column="model_id" />
+            <result property="enable" column="enable" />
+            <result property="sort" column="sort" />
+            <result property="remark" column="remark" />
+            <result property="version" column="version" />
+            <result property="creator_id" column="creator_id" />
+            <result property="creator_name" column="creator_name" />
+            <result property="updater_id" column="updater_id" />
+            <result property="updater_name" column="updater_name" />
+            <result property="create_time" column="create_time" />
+            <result property="update_time" column="update_time" />
+            <result property="deleted" column="deleted" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,template_name,agent_name,prompt_type,content,model_id,
+        enable,sort,remark,version,creator_id,
+        creator_name,updater_id,updater_name,create_time,update_time,
+        deleted
+    </sql>
+
+    <!-- 查询所有提示模板 -->
+    <select id="listAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM ai_prompt_template
+    </select>
+
+    <!-- 根据 ID 查询单个记录 -->
+    <select id="getById" parameterType="long" resultType="com.example.aicodehelper.domain.AiPromptTemplate">
+        SELECT * FROM ai_prompt_template WHERE id = #{id}
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.example.aicodehelper.domain.AiPromptTemplate">
+        INSERT INTO ai_prompt_template (name, content, description)
+        VALUES (#{name}, #{content}, #{description})
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="updateById" parameterType="com.example.aicodehelper.domain.AiPromptTemplate">
+        UPDATE ai_prompt_template
+        SET
+            name = #{name},
+            content = #{content},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除记录 -->
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM ai_prompt_template WHERE id = #{id}
+    </delete>
+
+    <!-- 根据名称模糊查询 -->
+    <select id="searchByName" parameterType="string" resultType="com.example.aicodehelper.domain.AiPromptTemplate">
+        SELECT * FROM ai_prompt_template
+        WHERE name LIKE CONCAT('%', #{name}, '%')
+    </select>
+</mapper>
