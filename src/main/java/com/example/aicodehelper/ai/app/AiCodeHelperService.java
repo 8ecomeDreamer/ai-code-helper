@@ -1,13 +1,15 @@
-package com.example.aicodehelper.ai;
+package com.example.aicodehelper.ai.app;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.Result;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
 
+@Tag(name = "aiCodeHelper", description = "AI助手")
 public interface AiCodeHelperService {
 
     @SystemMessage(fromResource = "system-prompt.txt")

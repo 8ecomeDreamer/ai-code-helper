@@ -1,6 +1,6 @@
 package com.example.aicodehelper.controller;
 
-import com.example.aicodehelper.ai.AiCodeHelperService;
+import com.example.aicodehelper.ai.app.AiCodeHelperService;
 import jakarta.annotation.Resource;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;

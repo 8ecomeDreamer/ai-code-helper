@@ -1,7 +1,6 @@
-package com.example.aicodehelper.ai;
+package com.example.aicodehelper.ai.app;
 
 import com.example.aicodehelper.ai.mcp.McpConfig;
-import com.example.aicodehelper.ai.rag.RagConfig;
 import com.example.aicodehelper.ai.tools.MathTools;
 import dev.langchain4j.guardrail.InputGuardrail;
 import dev.langchain4j.mcp.McpToolProvider;

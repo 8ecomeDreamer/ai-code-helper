@@ -1,11 +1,9 @@
 package com.example.aicodehelper;
 
-import com.example.aicodehelper.ai.AiCodeHelper;
-import com.example.aicodehelper.ai.AiCodeHelperService;
+import com.example.aicodehelper.ai.app.AiCodeHelper;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.response.ChatResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
