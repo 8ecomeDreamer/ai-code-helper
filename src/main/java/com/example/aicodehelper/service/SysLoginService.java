@@ -11,6 +11,7 @@ import com.example.aicodehelper.security.TokenService;
 import jakarta.annotation.Resource;
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 /**
  * 登录认证服务：账号密码校验、签发令牌、装载登录用户
@@ -42,12 +43,18 @@ public class SysLoginService {
         if (!Constants.STATUS_NORMAL.equals(user.getStatus())) {
             throw new ServiceException("对不起，您的账号：" + username + " 已停用");
         }
-        if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
-            throw new ServiceException("用户不存在或密码错误");
+        if (!md5MatchesPassword(password, user.getPassword())) {
+            throw new ServiceException("密码错误");
         }
         LoginUser loginUser = buildLoginUser(user);
         return tokenService.createToken(loginUser);
     }
+
+    private boolean md5MatchesPassword(String password, String oldPassWord) {
+        String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
+        return md5Password.equalsIgnoreCase(oldPassWord);
+    }
+
 
     /**
      * 根据用户ID装载登录用户上下文（拦截器每次请求调用），用户无效时返回 null
