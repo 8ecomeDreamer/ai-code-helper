@@ -6,9 +6,10 @@ spring:
     active: prod
 #   active: local
 server:
-  port: 8081
+  port: 8881
   servlet:
     context-path: /api
+
 
 # MyBatis-Plus 配置（实体为生成器 snake_case 字段风格，关闭驼峰映射）
 mybatis-plus:
