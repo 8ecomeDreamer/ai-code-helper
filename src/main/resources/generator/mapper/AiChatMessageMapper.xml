@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aicodehelper.mapper.AiChatMessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.aicodehelper.domain.AiChatMessage">
+            <id property="id" column="id" />
+            <result property="session_id" column="session_id" />
+            <result property="role" column="role" />
+            <result property="content" column="content" />
+            <result property="multi_modal_data" column="multi_modal_data" />
+            <result property="tool_calls" column="tool_calls" />
+            <result property="rag_retrieve_chunk" column="rag_retrieve_chunk" />
+            <result property="token_input" column="token_input" />
+            <result property="token_output" column="token_output" />
+            <result property="create_time" column="create_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,session_id,role,content,multi_modal_data,tool_calls,
+        rag_retrieve_chunk,token_input,token_output,create_time
+    </sql>
+
+
+    <!-- 查询所有消息 -->
+    <select id="listAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM ai_chat_message
+    </select>
+
+    <!-- 根据 ID 查询单个记录 -->
+    <select id="getById" parameterType="long" resultType="com.example.aicodehelper.domain.AiChatMessage">
+        SELECT * FROM ai_chat_message WHERE id = #{id}
+    </select>
+
+    <!-- 插入新记录 -->
+    <insert id="insert" parameterType="com.example.aicodehelper.domain.AiChatMessage">
+        INSERT INTO ai_chat_message (chat_session_id, content, sender_type)
+        VALUES (#{chatSessionId}, #{content}, #{senderType})
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="updateById" parameterType="com.example.aicodehelper.domain.AiChatMessage">
+        UPDATE ai_chat_message
+        SET
+            chat_session_id = #{chatSessionId},
+            content = #{content},
+            sender_type = #{senderType}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除记录 -->
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM ai_chat_message WHERE id = #{id}
+    </delete>
+
+    <!-- 根据会话 ID 查询消息列表 -->
+    <select id="listByChatSessionId" parameterType="long" resultType="com.example.aicodehelper.domain.AiChatMessage">
+        SELECT * FROM ai_chat_message WHERE chat_session_id = #{chatSessionId}
+    </select>
+</mapper>
