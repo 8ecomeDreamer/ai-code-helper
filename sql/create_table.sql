@@ -496,6 +496,46 @@ CREATE TABLE IF NOT EXISTS ai_knowledge_vector_chunk (
     update_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
     );
 
+
+CREATE TABLE IF NOT EXISTS ai_keyword_mapping (
+                                    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+                                    original_word VARCHAR(128) NOT NULL COMMENT '原始词（用户口语）',
+                                    standard_word VARCHAR(128) NOT NULL COMMENT '标准术语',
+                                    category VARCHAR(64) COMMENT '分类：面料/规格/检测',
+                                    hit_count BIGINT DEFAULT 0 COMMENT '命中次数，统计用',
+                                    enable TINYINT DEFAULT 1 COMMENT '是否启用',
+                                    create_time DATETIME,
+                                    update_time DATETIME,
+                                    deleted TINYINT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='关键词术语映射表';
+
+CREATE TABLE IF NOT EXISTS rag_document (
+                              id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                              doc_name VARCHAR(255) NOT NULL COMMENT '文档名称',
+                              oss_object_key VARCHAR(512) COMMENT 'MinIO对象key',
+                              oss_url VARCHAR(512) COMMENT '访问链接',
+                              kb_type VARCHAR(64) COMMENT '知识库分类：process/business/competitor',
+                              status TINYINT COMMENT '0待解析，1解析完成，2解析失败',
+                              chunk_ids TEXT COMMENT '向量切片ID列表',
+                              create_by BIGINT,
+                              create_time DATETIME,
+                              update_time DATETIME,
+                              deleted TINYINT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='RAG知识库文档表';
+
+
+CREATE TABLE IF NOT EXISTS ai_business_log (
+                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                 session_id BIGINT COMMENT '会话ID ai_chat_session.id',
+                                 message_id BIGINT COMMENT '消息ID ai_chat_shturl.cc/',
+                                 agent_name VARCHAR(128) COMMENT 'Agent名称：PlanAndExecuteAgent / ReActAgent / ReflectionAgent',
+                                 log_type VARCHAR(64) COMMENT '日志类型：plan / tool_call / reflection / dispatch',
+                                 log_content TEXT COMMENT '日志详情',
+                                 cost_ms BIGINT COMMENT '耗时毫秒',
+                                 create_time DATETIME
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI Agent业务执行日志';
+
+
 -- 普通索引
 CREATE INDEX idx_vector_chunk_docid ON ai_knowledge_vector_chunk(doc_id);
 CREATE INDEX idx_vector_chunk_parent ON ai_knowledge_vector_chunk(parent_id);
