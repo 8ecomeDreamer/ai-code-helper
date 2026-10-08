@@ -10,8 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.bridge.Message;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 封装通用agent
@@ -121,9 +123,73 @@ public abstract class BaseAgent {
 
     /**
      * 异步执行任务
+     * 流式输出
      */
-    public SseEmitter runSteam() {
+    public SseEmitter runSteam(String userPrompt) {
+        SseEmitter sseEmitter = new SseEmitter(SSE_TIMEOUT_MS); // 5-minute timeout
+        CompletableFuture.runAsync(() -> {
+            // 1.边界检查
+            if (this.state != AgentState.IDLE) {
+                throw new RuntimeException("Agent正在运行中...");
+            }
+            if(StrUtil.isBlank(userPrompt)){
+                throw new RuntimeException("用户输入不能为空");
+            }
+            // 2.修改状态
+            this.state = AgentState.RUNNING;
+            // 保存用户需求
+            messageList.add(new UserMessage(userPrompt));
+            // 返回结果
+            List <String> results = new ArrayList<>();
 
+            try {
+                // 循环执行step获取结果
+                for (int i = 0; i < maxStep && state != AgentState.FINISHED; i++) {
+                    int stepNumber = i + 1;
+                    currentStep = stepNumber;
+                    log.info("正在执行调用，目前进度： {}/{}", stepNumber, maxStep);
+                    String stepResult = step();
+                    String result = "Step " + stepNumber + ": " + stepResult;
+                    results.add(result);
+                }
+
+                if (currentStep >= maxStep) {
+                    state = AgentState.FINISHED;
+                    results.add("执行完成，执行次数： " + currentStep + " 次");
+                }
+                // 完成：替换为sseEmitter的complete
+                sseEmitter.complete();
+
+            } catch (Exception e) {
+                state = AgentState.ERROR;
+                log.error("执行出错：" + e);
+                // 完成：替换为sseEmitter的complete
+                try {
+                    sseEmitter.send(ERROR_PREFIX + "：" + e.getMessage());
+                    sseEmitter.complete();
+                } catch (IOException ex) {
+                    sseEmitter.completeWithError(ex);
+                }
+            } finally {
+                this.clean();
+            }
+        });
+
+        // 超时异常回调方法
+        sseEmitter.onTimeout(() -> {
+            this.state = AgentState.ERROR;
+            this.clean();
+            log.warn("SSE connection timeout");
+        });
+        // 正常完成回调方法
+        sseEmitter.onCompletion(() -> {
+            if (this.state == AgentState.RUNNING) {
+                this.state = AgentState.FINISHED;
+            }
+            this.clean();
+            log.info("SSE connection completed");
+        });
+        return sseEmitter;
     }
 
     /**
