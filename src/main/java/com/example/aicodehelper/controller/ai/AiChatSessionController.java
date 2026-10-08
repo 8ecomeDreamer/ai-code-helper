@@ -1,7 +1,7 @@
-package com.example.aicodehelper.controller;
+package com.example.aicodehelper.controller.ai;
 
 import com.example.aicodehelper.domain.AiChatSession;
-import com.example.aicodehelper.service.AiChatSessionService;
+import com.example.aicodehelper.service.ai.AiChatSessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

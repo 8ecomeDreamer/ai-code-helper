@@ -1,8 +1,8 @@
-package com.example.aicodehelper.service.impl;
+package com.example.aicodehelper.service.impl.ai;
 
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.example.aicodehelper.domain.AiPromptTemplate;
-import com.example.aicodehelper.service.AiPromptTemplateService;
+import com.example.aicodehelper.service.ai.AiPromptTemplateService;
 import com.example.aicodehelper.mapper.AiPromptTemplateMapper;
 import org.springframework.stereotype.Service;
 

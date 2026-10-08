@@ -1,8 +1,8 @@
-package com.example.aicodehelper.service.impl;
+package com.example.aicodehelper.service.impl.ai;
 
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.example.aicodehelper.domain.AiChatSession;
-import com.example.aicodehelper.service.AiChatSessionService;
+import com.example.aicodehelper.service.ai.AiChatSessionService;
 import com.example.aicodehelper.mapper.AiChatSessionMapper;
 import org.springframework.stereotype.Service;
 

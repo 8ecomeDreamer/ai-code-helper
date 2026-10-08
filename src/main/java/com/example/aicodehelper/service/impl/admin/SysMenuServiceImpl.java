@@ -1,4 +1,4 @@
-package com.example.aicodehelper.service.impl;
+package com.example.aicodehelper.service.impl.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
@@ -10,7 +10,7 @@ import com.example.aicodehelper.domain.vo.MetaVo;
 import com.example.aicodehelper.domain.vo.RouterVo;
 import com.example.aicodehelper.domain.vo.TreeSelect;
 import com.example.aicodehelper.mapper.SysMenuMapper;
-import com.example.aicodehelper.service.SysMenuService;
+import com.example.aicodehelper.service.admin.SysMenuService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

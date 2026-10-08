@@ -1,9 +1,9 @@
-package com.example.aicodehelper.service.impl;
+package com.example.aicodehelper.service.impl.admin;
 
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.example.aicodehelper.domain.SysRole;
 import com.example.aicodehelper.mapper.SysRoleMapper;
-import com.example.aicodehelper.service.SysRoleService;
+import com.example.aicodehelper.service.admin.SysRoleService;
 import org.springframework.stereotype.Service;
 
 /**

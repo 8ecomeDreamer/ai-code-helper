@@ -1,10 +1,9 @@
-package com.example.aicodehelper.service;
+package com.example.aicodehelper.service.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.aicodehelper.common.constant.Constants;
 import com.example.aicodehelper.common.core.LoginUser;
 import com.example.aicodehelper.common.exception.ServiceException;
-import com.example.aicodehelper.common.utils.SecurityUtils;
 import com.example.aicodehelper.domain.SysUser;
 import com.example.aicodehelper.mapper.SysUserMapper;
 import com.example.aicodehelper.security.TokenService;

@@ -1,12 +1,12 @@
-package com.example.aicodehelper.controller;
+package com.example.aicodehelper.controller.admin;
 
 import com.example.aicodehelper.common.core.Result;
 import com.example.aicodehelper.common.core.LoginUser;
 import com.example.aicodehelper.common.utils.SecurityUtils;
 import com.example.aicodehelper.domain.dto.LoginBody;
 import com.example.aicodehelper.domain.vo.RouterVo;
-import com.example.aicodehelper.service.SysLoginService;
-import com.example.aicodehelper.service.SysMenuService;
+import com.example.aicodehelper.service.admin.SysLoginService;
+import com.example.aicodehelper.service.admin.SysMenuService;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;

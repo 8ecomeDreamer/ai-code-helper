@@ -1,5 +1,6 @@
 package com.example.aicodehelper.controller;
 
+import com.example.aicodehelper.controller.ai.AiController;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

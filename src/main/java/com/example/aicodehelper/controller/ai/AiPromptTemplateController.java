@@ -1,8 +1,8 @@
-package com.example.aicodehelper.controller;
+package com.example.aicodehelper.controller.ai;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.aicodehelper.domain.AiPromptTemplate;
-import com.example.aicodehelper.service.AiPromptTemplateService;
+import com.example.aicodehelper.service.ai.AiPromptTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

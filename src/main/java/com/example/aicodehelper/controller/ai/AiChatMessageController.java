@@ -1,7 +1,7 @@
-package com.example.aicodehelper.controller;
+package com.example.aicodehelper.controller.ai;
 
 import com.example.aicodehelper.domain.AiChatMessage;
-import com.example.aicodehelper.service.AiChatMessageService;
+import com.example.aicodehelper.service.ai.AiChatMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

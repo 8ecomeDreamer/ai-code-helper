@@ -1,4 +1,4 @@
-package com.example.aicodehelper.service;
+package com.example.aicodehelper.service.admin;
 
 import com.example.aicodehelper.common.constant.Constants;
 import com.example.aicodehelper.domain.SysRole;

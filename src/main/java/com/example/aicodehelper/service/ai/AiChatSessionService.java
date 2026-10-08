@@ -1,4 +1,4 @@
-package com.example.aicodehelper.service;
+package com.example.aicodehelper.service.ai;
 
 import com.baomidou.mybatisplus.spring.service.IService;
 import com.example.aicodehelper.domain.AiChatSession;

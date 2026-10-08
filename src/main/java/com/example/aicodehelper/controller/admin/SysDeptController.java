@@ -1,10 +1,10 @@
-package com.example.aicodehelper.controller;
+package com.example.aicodehelper.controller.admin;
 
 import com.example.aicodehelper.common.annotation.RequiresPermissions;
 import com.example.aicodehelper.common.core.Result;
 import com.example.aicodehelper.common.utils.SecurityUtils;
 import com.example.aicodehelper.domain.SysDept;
-import com.example.aicodehelper.service.SysDeptService;
+import com.example.aicodehelper.service.admin.SysDeptService;
 import jakarta.annotation.Resource;
 import java.util.Date;
 import java.util.List;

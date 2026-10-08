@@ -1,11 +1,11 @@
-package com.example.aicodehelper.controller;
+package com.example.aicodehelper.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.aicodehelper.common.annotation.RequiresPermissions;
 import com.example.aicodehelper.common.constant.Constants;
 import com.example.aicodehelper.common.core.Result;
 import com.example.aicodehelper.domain.SysRole;
-import com.example.aicodehelper.service.SysRoleService;
+import com.example.aicodehelper.service.admin.SysRoleService;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
