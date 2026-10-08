@@ -23,6 +23,7 @@
         <mybatis-plus-boot-starter.version>3.5.17</mybatis-plus-boot-starter.version>
         <jjwt.version>0.12.6</jjwt.version>
         <swagger.version>1.6.14</swagger.version>
+        <hutool.version>5.8.26</hutool.version>
     </properties>
     <dependencies>
         <dependency>
@@ -130,6 +131,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${swagger.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
 
