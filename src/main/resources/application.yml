@@ -24,3 +24,12 @@ token:
   prefix: "Bearer "
   secret: ${TOKEN_SECRET:ai-code-helper-textile-agent-jwt-secret-key-2026}
   expire-minutes: 720
+
+#  minio
+minio:
+  endpoint: http://127.0.0.1:9000
+  access-key: textile_admin
+  secret-key: YourStrongPass_2026
+  bucket-name: textile-knowledge
+  # 外部访问地址，用于生成预览签名链接
+  external-endpoint: http://127.0.0.1:9000

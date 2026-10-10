@@ -24,6 +24,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <swagger.version>1.6.14</swagger.version>
         <hutool.version>5.8.26</hutool.version>
+        <minio.version>8.5.7</minio.version>
     </properties>
     <dependencies>
         <dependency>
@@ -137,6 +138,13 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
+        </dependency>
+
+        <!-- minio -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>${minio.version}</version>
         </dependency>
     </dependencies>
 
