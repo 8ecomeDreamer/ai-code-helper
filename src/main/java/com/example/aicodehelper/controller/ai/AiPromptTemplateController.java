@@ -12,7 +12,7 @@ import java.util.List;
 
 @Tag(name = "提示模板管理", description = "管理 AI 使用的提示模板")
 @RestController
-@RequestMapping("/api/prompt-template")
+@RequestMapping("/prompt-template")
 public class AiPromptTemplateController {
 
     @Autowired
@@ -37,5 +37,23 @@ public class AiPromptTemplateController {
     @PostMapping
     public boolean addTemplate(@RequestBody AiPromptTemplate template) {
         return aiPromptTemplateService.save(template);
+    }
+
+    @Operation(summary = "根据 ID 获取模板")
+    @GetMapping("/{id}")
+    public AiPromptTemplate getTemplateById(@PathVariable Long id) {
+        return aiPromptTemplateService.getById(id);
+    }
+
+    @Operation(summary = "修改模板")
+    @PutMapping
+    public boolean updateTemplate(@RequestBody AiPromptTemplate template) {
+        return aiPromptTemplateService.updateById(template);
+    }
+
+    @Operation(summary = "删除模板")
+    @DeleteMapping("/{id}")
+    public boolean deleteTemplate(@PathVariable Long id) {
+        return aiPromptTemplateService.removeById(id);
     }
 }
