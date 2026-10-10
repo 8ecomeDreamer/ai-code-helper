@@ -12,7 +12,7 @@ import java.util.List;
 
 @Tag(name = "聊天消息管理", description = "用于管理 AI 聊天中的消息记录")
 @RestController
-@RequestMapping("/api/chat-message")
+@RequestMapping("/chat-message")
 public class AiChatMessageController {
 
     @Autowired
@@ -76,7 +76,8 @@ public class AiChatMessageController {
     @GetMapping("/session/{chatSessionId}")
     public List<AiChatMessage> getMessagesBySessionId(@PathVariable Long chatSessionId) {
         return aiChatMessageService.lambdaQuery()
-                .eq(AiChatMessage::getId, chatSessionId)
+                .eq(AiChatMessage::getSession_id, chatSessionId)
+                .orderByAsc(AiChatMessage::getId)
                 .list();
     }
 }
