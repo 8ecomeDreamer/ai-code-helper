@@ -4,7 +4,7 @@ import com.example.aicodehelper.common.constant.Constants;
 import com.example.aicodehelper.common.core.Result;
 import com.example.aicodehelper.common.core.LoginUser;
 import com.example.aicodehelper.common.utils.SecurityUtils;
-import com.example.aicodehelper.service.SysLoginService;
+import com.example.aicodehelper.service.admin.SysLoginService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
