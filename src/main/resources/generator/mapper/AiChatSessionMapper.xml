@@ -32,20 +32,8 @@
         SELECT * FROM ai_chat_session WHERE id = #{id}
     </select>
 
-    <!-- 插入新记录 -->
-    <insert id="insert" parameterType="com.example.aicodehelper.domain.AiChatSession">
-        INSERT INTO ai_chat_session (user_id, title)
-        VALUES (#{userId}, #{title})
-    </insert>
-
-    <!-- 更新记录 -->
-    <update id="updateById" parameterType="com.example.aicodehelper.domain.AiChatSession">
-        UPDATE ai_chat_session
-        SET
-            user_id = #{userId},
-            title = #{title}
-        WHERE id = #{id}
-    </update>
+    <!-- 注意：CRUD 一律走 MyBatis-Plus 内置方法（按实体注解生成 SQL）。
+         切勿在此定义 id=insert/updateById 等同名语句，否则会覆盖内置方法导致字段绑定错误。 -->
 
     <!-- 删除记录 -->
     <delete id="deleteById" parameterType="long">

@@ -33,21 +33,8 @@
         SELECT * FROM ai_chat_message WHERE id = #{id}
     </select>
 
-    <!-- 插入新记录 -->
-    <insert id="insert" parameterType="com.example.aicodehelper.domain.AiChatMessage">
-        INSERT INTO ai_chat_message (chat_session_id, content, sender_type)
-        VALUES (#{chatSessionId}, #{content}, #{senderType})
-    </insert>
-
-    <!-- 更新记录 -->
-    <update id="updateById" parameterType="com.example.aicodehelper.domain.AiChatMessage">
-        UPDATE ai_chat_message
-        SET
-            chat_session_id = #{chatSessionId},
-            content = #{content},
-            sender_type = #{senderType}
-        WHERE id = #{id}
-    </update>
+    <!-- 注意：CRUD 一律走 MyBatis-Plus 内置方法（按实体注解生成 SQL）。
+         切勿在此定义 id=insert/updateById 等同名语句，否则会覆盖内置方法导致字段绑定错误。 -->
 
     <!-- 删除记录 -->
     <delete id="deleteById" parameterType="long">
@@ -56,6 +43,6 @@
 
     <!-- 根据会话 ID 查询消息列表 -->
     <select id="listByChatSessionId" parameterType="long" resultType="com.example.aicodehelper.domain.AiChatMessage">
-        SELECT * FROM ai_chat_message WHERE chat_session_id = #{chatSessionId}
+        SELECT * FROM ai_chat_message WHERE session_id = #{chatSessionId}
     </select>
 </mapper>

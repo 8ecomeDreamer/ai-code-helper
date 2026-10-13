@@ -41,21 +41,8 @@
         SELECT * FROM ai_prompt_template WHERE id = #{id}
     </select>
 
-    <!-- 插入新记录 -->
-    <insert id="insert" parameterType="com.example.aicodehelper.domain.AiPromptTemplate">
-        INSERT INTO ai_prompt_template (name, content, description)
-        VALUES (#{name}, #{content}, #{description})
-    </insert>
-
-    <!-- 更新记录 -->
-    <update id="updateById" parameterType="com.example.aicodehelper.domain.AiPromptTemplate">
-        UPDATE ai_prompt_template
-        SET
-            name = #{name},
-            content = #{content},
-            description = #{description}
-        WHERE id = #{id}
-    </update>
+    <!-- 注意：CRUD 一律走 MyBatis-Plus 内置方法（按实体注解生成 SQL）。
+         切勿在此定义 id=insert/updateById 等同名语句，否则会覆盖内置方法导致字段绑定错误。 -->
 
     <!-- 删除记录 -->
     <delete id="deleteById" parameterType="long">
@@ -65,6 +52,6 @@
     <!-- 根据名称模糊查询 -->
     <select id="searchByName" parameterType="string" resultType="com.example.aicodehelper.domain.AiPromptTemplate">
         SELECT * FROM ai_prompt_template
-        WHERE name LIKE CONCAT('%', #{name}, '%')
+        WHERE template_name LIKE CONCAT('%', #{templateName}, '%')
     </select>
 </mapper>
