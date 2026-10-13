@@ -1,4 +1,4 @@
-package com.example.aicodehelper.security;
+package com.example.aicodehelper.common.security;
 
 import com.example.aicodehelper.common.core.LoginUser;
 import io.jsonwebtoken.Claims;

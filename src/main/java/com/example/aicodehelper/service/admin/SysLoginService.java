@@ -6,7 +6,7 @@ import com.example.aicodehelper.common.core.LoginUser;
 import com.example.aicodehelper.common.exception.ServiceException;
 import com.example.aicodehelper.domain.SysUser;
 import com.example.aicodehelper.mapper.SysUserMapper;
-import com.example.aicodehelper.security.TokenService;
+import com.example.aicodehelper.common.security.TokenService;
 import jakarta.annotation.Resource;
 import java.util.Set;
 import org.springframework.stereotype.Service;

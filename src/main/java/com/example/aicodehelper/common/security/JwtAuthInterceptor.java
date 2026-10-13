@@ -1,4 +1,4 @@
-package com.example.aicodehelper.security;
+package com.example.aicodehelper.common.security;
 
 import com.example.aicodehelper.common.constant.Constants;
 import com.example.aicodehelper.common.core.Result;
