@@ -5,6 +5,11 @@ spring:
   profiles:
     active: prod
 #   active: local
+  # 综合问答支持图片/文档上传：放宽 multipart 限制（默认 1MB 会拒绝图片）
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 120MB
 server:
   port: 8881
   servlet:
@@ -25,11 +30,5 @@ token:
   secret: ${TOKEN_SECRET:ai-code-helper-textile-agent-jwt-secret-key-2026}
   expire-minutes: 720
 
-#  minio
-minio:
-  endpoint: http://127.0.0.1:9000
-  access-key: textile_admin
-  secret-key: YourStrongPass_2026
-  bucket-name: textile-knowledge
-  # 外部访问地址，用于生成预览签名链接
-  external-endpoint: http://127.0.0.1:9000
+
+

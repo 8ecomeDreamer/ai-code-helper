@@ -20,7 +20,7 @@ langChain4j:
         model-name: qwen-max
         api-key:  ${LANGCHAIN4J_API_KEY}
       embedding-model:
-        model-name: text-embedding-async-v1 # 经济情况良好也可选择 text-embedding-v4，免费额度有 qwen3.7-text-embedding text-embedding-v1 text-embedding-v2 text-embedding-v3
+        model-name: text-embedding-async-v1
         api-key:  ${LANGCHAIN4J_API_KEY}
       streaming-chat-model:
         model-name: qwen-max
@@ -28,3 +28,13 @@ langChain4j:
 mcp:
   baiduZP:
     apiKey: ${BAIDUZP_API_KEY} # 百度智能云
+
+
+#  minio
+minio:
+  endpoint: http://127.0.0.1:9000
+  access-key: ${minio_user}
+  secret-key: ${minio_password}
+  bucket-name: cw-ai
+  # 外部访问地址，用于生成预览签名链接
+  external-endpoint: http://127.0.0.1:9000
