@@ -1,6 +1,6 @@
 package com.example.aicodehelper.config;
 
-import com.example.aicodehelper.security.JwtAuthInterceptor;
+import com.example.aicodehelper.common.security.JwtAuthInterceptor;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
