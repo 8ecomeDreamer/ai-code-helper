@@ -22,9 +22,10 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
 
     @Override
     public String upload(MultipartFile file, String prefix) throws Exception {
-        // 获取后缀
+        // 获取后缀（无扩展名文件名不截断，避免越界）
         String originalName = file.getOriginalFilename();
-        String suffix = originalName.substring(originalName.lastIndexOf("."));
+        int dot = originalName == null ? -1 : originalName.lastIndexOf('.');
+        String suffix = dot >= 0 ? originalName.substring(dot) : "";
         // 拼接唯一objectKey: knowledge/pdf/xxxx.pdf
         String objectKey = prefix + "/" + UUID.randomUUID() + suffix;
 

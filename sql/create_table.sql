@@ -536,6 +536,25 @@ CREATE TABLE IF NOT EXISTS ai_business_log (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI Agent业务执行日志';
 
 
+CREATE TABLE IF NOT EXISTS ai_chat_message_attachment (
+                                 id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '附件主键',
+                                 message_id BIGINT NOT NULL COMMENT '消息ID ai_chat_message.id',
+                                 session_id BIGINT NOT NULL COMMENT '会话ID ai_chat_session.id（同时作为MinIO文件夹名）',
+                                 attach_type VARCHAR(16) NOT NULL COMMENT '附件类型：image=图片 file=文档附件',
+                                 file_name VARCHAR(255) NOT NULL COMMENT '原始文件名',
+                                 file_ext VARCHAR(32) COMMENT '文件扩展名（不含点，如 jpg、pdf）',
+                                 mime_type VARCHAR(64) COMMENT 'MIME类型，如 image/jpeg',
+                                 file_size BIGINT COMMENT '文件大小（字节）',
+                                 bucket_name VARCHAR(64) NOT NULL DEFAULT 'cw-ai' COMMENT 'MinIO bucket名',
+                                 object_name VARCHAR(512) NOT NULL COMMENT 'MinIO对象名（含会话ID文件夹，如 12/uuid.jpg）',
+                                 sort_no INT NOT NULL DEFAULT 0 COMMENT '同消息内展示顺序（上传顺序）',
+                                 create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI聊天消息附件表（综合问答图片/文档的MinIO对象存储记录）';
+
+CREATE INDEX idx_chat_attach_message ON ai_chat_message_attachment(message_id);
+CREATE INDEX idx_chat_attach_session ON ai_chat_message_attachment(session_id);
+
+
 -- 普通索引
 CREATE INDEX idx_vector_chunk_docid ON ai_knowledge_vector_chunk(doc_id);
 CREATE INDEX idx_vector_chunk_parent ON ai_knowledge_vector_chunk(parent_id);
