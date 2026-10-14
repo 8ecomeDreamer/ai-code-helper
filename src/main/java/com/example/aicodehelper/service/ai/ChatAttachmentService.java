@@ -1,4 +1,4 @@
-package com.example.aicodehelper.service.biz;
+package com.example.aicodehelper.service.ai;
 
 import com.example.aicodehelper.ai.support.AiJson;
 import com.example.aicodehelper.domain.AiChatMessage;
