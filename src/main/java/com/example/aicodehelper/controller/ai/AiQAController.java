@@ -1,32 +1,32 @@
 package com.example.aicodehelper.controller.ai;
 
-import com.example.aicodehelper.ai.app.AiCodeHelperService;
-//import com.example.aicodehelper.common.core.AiJson;
-import com.example.aicodehelper.common.core.Result;
+import com.example.aicodehelper.ai.app.service.AiCodeHelperHigherService;
+import com.example.aicodehelper.ai.app.service.AiCodeHelperService;
+import com.example.aicodehelper.common.core.AiJson;
 import com.example.aicodehelper.service.ai.ChatAttachmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
 @RequestMapping("/ai")
-public class AiController {
+@Tag(name = "AiQAController", description = "AI综合问答界面接口")
+public class AiQAController {
 
 
     @Resource
     private AiCodeHelperService aiCodeHelperService;
 
-//    @Resource
-//    private IntentRouterService intentRouterService;
-//
-//    @Resource
-//    private MultimodalChatService multimodalChatService;
+    @Resource
+    private AiCodeHelperHigherService aiCodeHelperHigherService;
 
     @Resource
     private ChatAttachmentService chatAttachmentService;
@@ -58,7 +58,34 @@ public class AiController {
             @RequestParam(name = "message", required = false, defaultValue = "") String message,
             @RequestParam(name = "images", required = false) List<MultipartFile> images,
             @RequestParam(name = "files", required = false) List<MultipartFile> files) {
-        return toSse(aiCodeHelperService.chatStream(memoryId, message));
+        // 有图片/文档时：先存 MinIO（cw-ai/{会话id}/）并写消息表+附件表，失败不中断问答
+        chatAttachmentService.persistUserMessage(memoryId, message, images, files);
+
+        Flux<String> stream;
+        if (images != null && !images.isEmpty()) {
+            // 图片轮：走自定义高阶多模态 API（官方 SDK 流式）
+            List<String> dataUris = new ArrayList<>();
+            for (MultipartFile image : images) {
+                try {
+                    dataUris.add(toDataUri(image));
+                } catch (Exception e) {
+                    // 单张不可读跳过，不中断整轮问答
+                }
+            }
+            stream = dataUris.isEmpty()
+                    ? aiCodeHelperService.chatStream(memoryId, message)
+                    : aiCodeHelperHigherService.multiModelChat(dataUris, message);
+        } else {
+            // 纯文本/仅文档轮：仍走 AiServices 声明式链路
+            stream = aiCodeHelperService.chatStream(memoryId, message);
+        }
+        return toSse(stream);
+    }
+
+    /** 上传图片转 base64 data URI（DashScope 多模态 content 的 image 字段支持该格式） */
+    private String toDataUri(MultipartFile file) throws Exception {
+        String mime = file.getContentType() == null ? "image/jpeg" : file.getContentType();
+        return "data:" + mime + ";base64," + Base64.getEncoder().encodeToString(file.getBytes());
     }
 
     /**
@@ -75,12 +102,11 @@ public class AiController {
 
     /** 增量文本转 JSON 帧；序列化异常时降级为原文 */
     private String encodeFrame(String chunk) {
-//        try {
-//            return "{\"d\":" + AiJson.mapper().writeValueAsString(chunk) + "}";
-//        } catch (Exception e) {
-//            return chunk;
-//        }
-        return chunk;
+        try {
+            return "{\"d\":" + AiJson.mapper().writeValueAsString(chunk) + "}";
+        } catch (Exception e) {
+            return chunk;
+        }
     }
 
 //    /**

@@ -1,6 +1,6 @@
 package com.example.aicodehelper.controller;
 
-import com.example.aicodehelper.controller.ai.AiController;
+import com.example.aicodehelper.controller.ai.AiQAController;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,13 +13,13 @@ import reactor.core.publisher.Flux;
 class AiControllerTest {
 
     @Resource
-    private AiController aiController;
+    private AiQAController aiQAController;
 
 
     @Test
     void chatWithServerSentEvent() {
         // 1.测试Listener
-        Flux<ServerSentEvent<String>> userMessage = aiController.chat(12, "Hi");
+        Flux<ServerSentEvent<String>> userMessage = aiQAController.chat(12, "Hi");
         // 2.输出
         System.out.println(userMessage);
     }

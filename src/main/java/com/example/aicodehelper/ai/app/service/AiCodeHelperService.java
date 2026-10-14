@@ -1,4 +1,4 @@
-package com.example.aicodehelper.ai.app;
+package com.example.aicodehelper.ai.app.service;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.Result;
@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-@Tag(name = "aiCodeHelper", description = "AI助手")
+@Tag(name = "aiCodeHelper", description = "langChain4j常用API")
 public interface AiCodeHelperService {
 
     @SystemMessage(fromResource = "com/example/aicodehelper/ai/prompt/system-prompt.txt")

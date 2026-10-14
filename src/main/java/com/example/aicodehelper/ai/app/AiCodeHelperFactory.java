@@ -1,5 +1,6 @@
 package com.example.aicodehelper.ai.app;
 
+import com.example.aicodehelper.ai.app.service.AiCodeHelperService;
 import com.example.aicodehelper.ai.mcp.McpConfig;
 //import com.example.aicodehelper.ai.model.TextOnlyStreamingChatModel;
 import com.example.aicodehelper.ai.tools.MathTools;
@@ -11,11 +12,13 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Tag(name = "AiCodeHelperFactory", description = "ChatModel自定义配置")
 public class AiCodeHelperFactory
 {
 

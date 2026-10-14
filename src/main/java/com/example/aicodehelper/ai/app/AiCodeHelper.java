@@ -5,6 +5,7 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import jakarta.annotation.Resource;
 
 @Service
 @Slf4j
+@Tag(name = "AiCodeHelper", description = "一些AI小demo")
 public class AiCodeHelper {
 
     // 1.引入chatModel
