@@ -1,10 +1,8 @@
 package com.example.aicodehelper.service.ai;
 
-import com.example.aicodehelper.ai.support.AiJson;
+import com.example.aicodehelper.common.core.AiJson;
 import com.example.aicodehelper.domain.AiChatMessage;
 import com.example.aicodehelper.domain.AiChatMessageAttachment;
-import com.example.aicodehelper.service.ai.AiChatMessageAttachmentService;
-import com.example.aicodehelper.service.ai.AiChatMessageService;
 import com.example.aicodehelper.service.file.FileStorageService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

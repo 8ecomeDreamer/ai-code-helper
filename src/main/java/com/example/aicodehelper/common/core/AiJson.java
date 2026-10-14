@@ -1,4 +1,4 @@
-package com.example.aicodehelper.ai.support;
+package com.example.aicodehelper.common.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

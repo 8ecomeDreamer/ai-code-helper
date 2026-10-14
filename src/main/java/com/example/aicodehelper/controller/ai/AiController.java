@@ -1,7 +1,7 @@
 package com.example.aicodehelper.controller.ai;
 
 import com.example.aicodehelper.ai.app.AiCodeHelperService;
-import com.example.aicodehelper.ai.support.AiJson;
+//import com.example.aicodehelper.common.core.AiJson;
 import com.example.aicodehelper.common.core.Result;
 import com.example.aicodehelper.service.ai.ChatAttachmentService;
 import jakarta.annotation.Resource;
@@ -75,11 +75,12 @@ public class AiController {
 
     /** 增量文本转 JSON 帧；序列化异常时降级为原文 */
     private String encodeFrame(String chunk) {
-        try {
-            return "{\"d\":" + AiJson.mapper().writeValueAsString(chunk) + "}";
-        } catch (Exception e) {
-            return chunk;
-        }
+//        try {
+//            return "{\"d\":" + AiJson.mapper().writeValueAsString(chunk) + "}";
+//        } catch (Exception e) {
+//            return chunk;
+//        }
+        return chunk;
     }
 
 //    /**
