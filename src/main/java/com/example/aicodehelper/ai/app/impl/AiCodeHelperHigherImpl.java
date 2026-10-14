@@ -37,11 +37,11 @@ public class AiCodeHelperHigherImpl implements AiCodeHelperHigherService {
             "请仔细观察我上传的图片，结合纺织专业知识进行识别、分析并给出解释。";
 
     /** 视觉模型名，与面料识别共用同一配置项 */
-    @Value("${langChain4j.community.dashscope.vision-model.model-name}")
+    @Value("${langChain4j.community.dashscope.multi-model.model-name}")
     private String visionModelName;
 
     /** 视觉模型 apiKey，缺省复用文本模型的 key（嵌套占位符取默认值） */
-    @Value("${langChain4j.community.dashscope.vision-model.api-key}")
+    @Value("${langChain4j.community.dashscope.multi-model.api-key}")
     private String apiKey;
 
     @Override
