@@ -12,19 +12,19 @@ import java.util.List;
 @Tag(name = "aiCodeHelper", description = "AI助手")
 public interface AiCodeHelperService {
 
-    @SystemMessage(fromResource = "system-prompt.txt")
+    @SystemMessage(fromResource = "com/example/aicodehelper/ai/prompt/txt/system-prompt.txt")
     String Chat(String userMessage);
 
-    @SystemMessage(fromResource = "system-prompt.txt")
+    @SystemMessage(fromResource = "com/example/aicodehelper/ai/prompt/txt/system-prompt.txt")
     Record ChatForRecord(String userMessage);
 
     // 学习报告
     record Record(String name, List<String> suggestionList){};
 
-    @SystemMessage(fromResource = "system-prompt.txt")
+    @SystemMessage(fromResource = "com/example/aicodehelper/ai/prompt/txt/system-prompt.txt")
     Result<String> ChatWithRagResult(String userMessage);
 
     // 流式输出
-    @SystemMessage(fromResource = "system-prompt.txt")
+    @SystemMessage(fromResource = "com/example/aicodehelper/ai/prompt/txt/system-prompt.txt")
     Flux<String> chatStream(@MemoryId int memoryId, @UserMessage String message);
 }
