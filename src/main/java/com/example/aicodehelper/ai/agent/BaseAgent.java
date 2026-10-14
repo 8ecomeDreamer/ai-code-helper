@@ -90,6 +90,7 @@ public abstract class BaseAgent {
         // 2.修改状态
         this.state = AgentState.RUNNING;
         // 保存用户需求
+        this.userPrompt = userPrompt;
         messageList.add(new UserMessage(userPrompt));
         // 返回结果
         List <String> results = new ArrayList<>();
@@ -138,6 +139,7 @@ public abstract class BaseAgent {
             // 2.修改状态
             this.state = AgentState.RUNNING;
             // 保存用户需求
+            this.userPrompt = userPrompt;
             messageList.add(new UserMessage(userPrompt));
             // 返回结果
             List <String> results = new ArrayList<>();
