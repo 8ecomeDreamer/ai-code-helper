@@ -1,7 +1,6 @@
 package com.example.aicodehelper.controller.ai;
 
 import com.example.aicodehelper.common.core.Result;
-import com.example.aicodehelper.service.biz.ErpService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -18,15 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/erp")
 public class ErpController {
 
-    @Resource
-    private ErpService erpService;
-
-    /**
-     * 拉取 ERP 面料成本主数据（确定性接口调用，非 Agent）。
-     */
-    @Operation(summary = "ERP 面料成本列表")
-    @GetMapping("/fabric/list")
-    public Result listFabrics() {
-        return Result.success(erpService.listFabrics());
-    }
+//    @Resource
+//    private ErpService erpService;
+//
+//    /**
+//     * 拉取 ERP 面料成本主数据（确定性接口调用，非 Agent）。
+//     */
+//    @Operation(summary = "ERP 面料成本列表")
+//    @GetMapping("/fabric/list")
+//    public Result listFabrics() {
+//        return Result.success(erpService.listFabrics());
+//    }
 }

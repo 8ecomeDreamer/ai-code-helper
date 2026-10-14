@@ -1,7 +1,6 @@
 package com.example.aicodehelper.controller.ai;
 
 import com.example.aicodehelper.common.core.Result;
-import com.example.aicodehelper.service.biz.QuoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -21,31 +20,31 @@ import java.util.Map;
 @RequestMapping("/quote")
 public class QuoteController {
 
-    @Resource
-    private QuoteService quoteService;
-
-    /**
-     * 生成报价邮件（Agent 思考后给出回复建议）。
-     *
-     * <p>请求体：{@code { "quote": {...前端 computeQuote 结果...}, "lang": "zh|en|both", "customer": "称呼" }}</p>
-     *
-     * @return data 为邮件 Markdown 文本
-     */
-    @Operation(summary = "生成报价邮件")
-    @PostMapping("/email")
-    @SuppressWarnings("unchecked")
-    public Result generateEmail(@RequestBody Map<String, Object> body) {
-        Object quoteObj = body.get("quote");
-        if (!(quoteObj instanceof Map)) {
-            return Result.error("报价数据 quote 不能为空");
-        }
-        String lang = String.valueOf(body.getOrDefault("lang", "both"));
-        String customer = body.get("customer") == null ? "" : String.valueOf(body.get("customer"));
-        try {
-            String email = quoteService.generateEmail((Map<String, Object>) quoteObj, lang, customer);
-            return Result.success("报价邮件已生成", email);
-        } catch (Exception e) {
-            return Result.error("报价邮件生成失败：" + e.getMessage());
-        }
-    }
+//    @Resource
+//    private QuoteService quoteService;
+//
+//    /**
+//     * 生成报价邮件（Agent 思考后给出回复建议）。
+//     *
+//     * <p>请求体：{@code { "quote": {...前端 computeQuote 结果...}, "lang": "zh|en|both", "customer": "称呼" }}</p>
+//     *
+//     * @return data 为邮件 Markdown 文本
+//     */
+//    @Operation(summary = "生成报价邮件")
+//    @PostMapping("/email")
+//    @SuppressWarnings("unchecked")
+//    public Result generateEmail(@RequestBody Map<String, Object> body) {
+//        Object quoteObj = body.get("quote");
+//        if (!(quoteObj instanceof Map)) {
+//            return Result.error("报价数据 quote 不能为空");
+//        }
+//        String lang = String.valueOf(body.getOrDefault("lang", "both"));
+//        String customer = body.get("customer") == null ? "" : String.valueOf(body.get("customer"));
+//        try {
+//            String email = quoteService.generateEmail((Map<String, Object>) quoteObj, lang, customer);
+//            return Result.success("报价邮件已生成", email);
+//        } catch (Exception e) {
+//            return Result.error("报价邮件生成失败：" + e.getMessage());
+//        }
+//    }
 }
