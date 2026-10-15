@@ -5,6 +5,7 @@ import com.example.aicodehelper.common.enums.AgentState;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.bridge.Message;
@@ -27,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
  */
 @Data
 @Slf4j
+@Tag(name="BaseAgent", description = "基础agent,封装通用执行流程")
+
 public abstract class BaseAgent {
 
 

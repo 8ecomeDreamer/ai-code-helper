@@ -7,6 +7,7 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationR
 import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
 import com.example.aicodehelper.ai.app.AiCodeHelperHigherService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,7 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
     private String apiKey;
 
     @Override
+    @Tag(name = "multiModelChat", description = "多模态回复")
     public Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt) {
         List<String> images = imageUrls == null ? List.of() : imageUrls;
         List<MultipartFile> docs = files == null ? List.of() : files;
@@ -117,6 +119,7 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
     }
 
     @Override
+    @Tag(name = "fileMCPChat", description = "调用MCP并理解文件")
     public Flux<String> fileMCPChat(List<String> fileUrls, String prompt) {
         if (fileUrls == null || fileUrls.isEmpty()) {
             return Flux.error(new IllegalArgumentException("fileMCPChat 至少需要一个文档 URL"));
@@ -134,6 +137,7 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
     }
 
     /** 拼装多模态消息并发起增量流式调用，Flowable 桥接 Flux 逐增量文本下发 */
+    @Tag(name = "stream", description = "拼装多模态消息并发起增量流式调用")
     private Flux<String> stream(List<Map<String, Object>> contents, String model) {
         MultiModalMessage userMessage = MultiModalMessage.builder()
                 .role(Role.USER.getValue())
