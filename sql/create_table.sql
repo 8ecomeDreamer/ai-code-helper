@@ -561,3 +561,30 @@ CREATE INDEX idx_vector_chunk_parent ON ai_knowledge_vector_chunk(parent_id);
 CREATE INDEX idx_vector_chunk_group ON ai_knowledge_vector_chunk(group_id);
 -- 向量HNSW索引（适配百万级数据，项目默认索引类型）
 CREATE INDEX idx_vector_embedding_hnsw ON ai_knowledge_vector_chunk USING hnsw (embedding vector_cosine_ops);
+
+
+-- 布号主数据表：ERP 面料成本五项拆分（坯布/织造/染整/检测/包装），驱动智能报价计算与报价邮件生成
+CREATE TABLE IF NOT EXISTS ai_fabric_item (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    fabric_code     VARCHAR(32)    NOT NULL COMMENT '布号（ERP编号，如 CW-2101）',
+    fabric_name     VARCHAR(64)    NOT NULL COMMENT '面料名称（中文）',
+    fabric_name_en  VARCHAR(64)    NOT NULL DEFAULT '' COMMENT '面料名称（英文）',
+    composition     VARCHAR(128)   NOT NULL DEFAULT '' COMMENT '成分（如 100% Cotton）',
+    spec            VARCHAR(128)   NOT NULL DEFAULT '' COMMENT '规格（纱支/密度，如 40x40 133x72）',
+    weight          VARCHAR(32)    NOT NULL DEFAULT '' COMMENT '克重（如 120 GSM）',
+    width           VARCHAR(32)    NOT NULL DEFAULT '' COMMENT '门幅（如 57/58"）',
+    cost_material   DECIMAL(10,2)  NOT NULL DEFAULT 0.00 COMMENT '坯布成本（元/米）',
+    cost_process    DECIMAL(10,2)  NOT NULL DEFAULT 0.00 COMMENT '织造/工艺成本（元/米）',
+    cost_dyeing     DECIMAL(10,2)  NOT NULL DEFAULT 0.00 COMMENT '染整成本（元/米）',
+    cost_test       DECIMAL(10,2)  NOT NULL DEFAULT 0.00 COMMENT '检测成本（元/米）',
+    cost_packing    DECIMAL(10,2)  NOT NULL DEFAULT 0.00 COMMENT '包装成本（元/米）',
+    lead_time       INT            NOT NULL DEFAULT 25 COMMENT '交货期（确认订单后天数）',
+    moq             INT            NOT NULL DEFAULT 1000 COMMENT '最小起订量 MOQ（米）',
+    status          TINYINT        NOT NULL DEFAULT 1 COMMENT '状态：0-下架 1-上架',
+    create_time     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted         TINYINT        NOT NULL DEFAULT 0 COMMENT '逻辑删除：0-否 1-是',
+    UNIQUE KEY uk_fabric_code (fabric_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='布号主数据表（ERP 面料成本，智能报价用）';
+
+CREATE INDEX idx_fabric_item_status ON ai_fabric_item(status, deleted);

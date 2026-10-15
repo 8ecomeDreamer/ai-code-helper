@@ -163,3 +163,13 @@ insert into sys_job values(1, '系统默认（无参）', 'DEFAULT', 'ryTask.ryN
 insert into sys_job values(2, '系统默认（有参）', 'DEFAULT', 'ryTask.ryParams(\'ry\')',  '0/15 * * * * ?', '3', '1', '1', 'admin', sysdate(), '', null, '');
 
 insert into sys_notice values('1', '纺织智能体系统上线通知', '1', '<p>纺织AI智能体已上线，支持面料知识库、工艺问答</p>', '0', 'admin', sysdate(), '', null, '管理员');
+
+-- ----------------------------
+-- 初始化-布号主数据（ERP 面料成本五项拆分，智能报价下拉与邮件生成数据源）
+-- ----------------------------
+insert into ai_fabric_item (fabric_code, fabric_name, fabric_name_en, composition, spec, weight, width, cost_material, cost_process, cost_dyeing, cost_test, cost_packing, lead_time, moq, status) values
+('CW-2101', '全棉府绸', 'Cotton Poplin', '100% Cotton', '40x40 133x72', '120 GSM', '57/58"', 6.80, 1.60, 1.90, 0.40, 0.50, 25, 1000, 1),
+('CW-3205', '涤棉斜纹卡', 'T/C Twill', '65% Polyester 35% Cotton', '32x32 130x70', '180 GSM', '63"', 5.60, 1.40, 1.60, 0.35, 0.45, 20, 2000, 1),
+('CW-4408', '全棉牛仔布', 'Cotton Denim', '100% Cotton', '10x10 70x42', '280 GSM', '59"', 9.50, 2.20, 2.60, 0.50, 0.70, 30, 3000, 1),
+('CW-5102', '锦纶塔丝隆', 'Nylon Taslan', '100% Nylon', '70D*70D 190T', '90 GSM', '58"', 7.20, 1.80, 2.10, 0.45, 0.55, 22, 1500, 1),
+('CW-6301', '人棉印花布', 'Rayon Challis', '100% Rayon', '30x30 68x60', '140 GSM', '55"', 6.10, 1.50, 2.20, 0.40, 0.50, 28, 1000, 1);
