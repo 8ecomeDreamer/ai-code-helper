@@ -1,5 +1,6 @@
 package com.example.aicodehelper.controller.ai;
 
+import com.example.aicodehelper.common.utils.SecurityUtils;
 import com.example.aicodehelper.domain.AiChatSession;
 import com.example.aicodehelper.service.ai.AiChatSessionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,16 @@ public class AiChatSessionController {
                 .list();
     }
 
+    @Operation(summary = "获取当前登录用户的会话（聊天页侧边栏历史）")
+    @GetMapping("/my")
+    public List<AiChatSession> getMySessions() {
+        Long userId = SecurityUtils.getUserId();
+        return aiChatSessionService.lambdaQuery()
+                .eq(AiChatSession::getUser_id, userId)
+                .orderByDesc(AiChatSession::getId)
+                .list();
+    }
+
     @Operation(summary = "根据用户 ID 获取会话")
     @GetMapping("/user/{userId}")
     public List<AiChatSession> getSessionsByUserId(@PathVariable Long userId) {
@@ -42,8 +53,9 @@ public class AiChatSessionController {
 
     @Operation(summary = "添加新会话")
     @PostMapping
-    public boolean addSession(@RequestBody AiChatSession session) {
-        return aiChatSessionService.save(session);
+    public AiChatSession addSession(@RequestBody AiChatSession session) {
+        aiChatSessionService.save(session);
+        return session;
     }
 
     @Operation(summary = "修改会话")

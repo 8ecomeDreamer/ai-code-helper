@@ -47,19 +47,19 @@ public class ChatAttachmentService {
     /**
      * 持久化本轮 user 消息及其附件。
      *
+     * <p>无论是否带附件都写入 ai_chat_message（保证历史记录可完整回溯），
+     * 带附件时额外上传 MinIO 并写 ai_chat_message_attachment。</p>
+     *
      * @param sessionId 会话id（memoryId），同时作为 MinIO 文件夹名
      * @param message   用户输入文字（可为空）
      * @param images    图片附件，可为 null
      * @param files     文档附件，可为 null
-     * @return 消息id；无附件时返回 null（不落库）
+     * @return 消息id；落库失败返回 null
      */
     public Long persistUserMessage(long sessionId, String message,
                                    List<MultipartFile> images, List<MultipartFile> files) {
         List<MultipartFile> imgs = images == null ? List.of() : images;
         List<MultipartFile> docs = files == null ? List.of() : files;
-        if (imgs.isEmpty() && docs.isEmpty()) {
-            return null;
-        }
 
         // 1. 逐个上传 MinIO（文件夹=会话id），收集元数据与附件行
         List<Map<String, Object>> modalMeta = new ArrayList<>();

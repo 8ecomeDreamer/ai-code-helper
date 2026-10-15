@@ -1,7 +1,9 @@
 package com.example.aicodehelper.controller.ai;
 
 import com.example.aicodehelper.domain.AiChatMessage;
+import com.example.aicodehelper.domain.vo.ChatMessageVo;
 import com.example.aicodehelper.service.ai.AiChatMessageService;
+import com.example.aicodehelper.service.ai.ChatHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +19,9 @@ public class AiChatMessageController {
 
     @Autowired
     private AiChatMessageService aiChatMessageService;
+
+    @Autowired
+    private ChatHistoryService chatHistoryService;
 
     /**
      * 获取所有消息
@@ -67,6 +72,15 @@ public class AiChatMessageController {
     @DeleteMapping("/{id}")
     public boolean deleteMessage(@PathVariable Long id) {
         return aiChatMessageService.removeById(id);
+    }
+
+    /**
+     * 会话历史消息（含附件与预览链接，聊天页恢复历史对话用）
+     */
+    @Operation(summary = "根据会话 ID 获取历史消息（带附件）")
+    @GetMapping("/history/{sessionId}")
+    public List<ChatMessageVo> getHistory(@PathVariable Long sessionId) {
+        return chatHistoryService.history(sessionId);
     }
 
     /**
