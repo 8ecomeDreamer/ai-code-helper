@@ -29,8 +29,9 @@ public class AiCodeHelperFactory
     private ContentRetriever contentRetriever;
     @Resource
     private McpConfig mcpConfig;
+    /** MCP 未配置时 Bean 为 null，用 ObjectProvider 安全获取，避免强依赖拖垮启动 */
     @Resource
-    private McpToolProvider mcpToolProvider;
+    private org.springframework.beans.factory.ObjectProvider<McpToolProvider> mcpToolProviderProvider;
 
     @Resource
     private InputGuardrail inputGuardrail;
@@ -44,7 +45,7 @@ public class AiCodeHelperFactory
         ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
 
         // 构建AI服务
-        return AiServices.builder(AiCodeHelperService.class)
+        AiServices<AiCodeHelperService> builder = AiServices.builder(AiCodeHelperService.class)
                 .chatModel(myQwenChatModel)
                 // 文本模型回放共享记忆时剥离图片等多模态内容，避免 qwen-max 报错
                 .streamingChatModel(qwenStreamingChatModel) // 流式输出
@@ -52,9 +53,12 @@ public class AiCodeHelperFactory
                 .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10)) // 每个会话独立存储
                 .contentRetriever(contentRetriever) // Rag检索生成
                 .tools(new MathTools()) // 工具调用
-                .toolProvider(mcpToolProvider) // mcp工具调用
-                .inputGuardrails(inputGuardrail)
-                .build();
+                .inputGuardrails(inputGuardrail);
+        McpToolProvider mcpToolProvider = mcpToolProviderProvider.getIfAvailable();
+        if (mcpToolProvider != null) {
+            builder.toolProvider(mcpToolProvider); // mcp工具调用
+        }
+        return builder.build();
     }
 }
 

@@ -14,11 +14,15 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class McpConfig {
 
-    @Value("${mcp.baiduZP.apiKey}")
+    @Value("${mcp.baiduZP.apiKey:}")
     private String apiKey;
 
     @Bean
     public McpToolProvider mcpToolProvider() {
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("mcp.baiduZP.apiKey 未配置，跳过联网搜索 MCP；竞品调研将降级模型知识/演示数据");
+            return null;
+        }
         try {
 
             // MCP 传输， 这里有两种传输方式（SSE和Stdio， 前者就是http连接）
@@ -42,10 +46,13 @@ public class McpConfig {
             return toolProvider;
 
         } catch (Exception e) {
-                log.error("Failed to create MCP tool provider: {}", e.getMessage(), e);
-                // 返回一个空的工具提供者或 null
-                return null;
-            }
+            log.error("Failed to create MCP tool provider: {}", e.getMessage(), e);
+            // 返回一个空的工具提供者或 null
+            return null;
         }
+    }
+
+
+
 
 }
