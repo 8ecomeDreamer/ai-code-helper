@@ -1,4 +1,4 @@
-package com.example.aicodehelper.ai.app.impl;
+package com.example.aicodehelper.ai.app;
 
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationOutput;
@@ -6,7 +6,7 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationP
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
-import com.example.aicodehelper.ai.app.service.AiCodeHelperHigherService;
+import com.example.aicodehelper.ai.app.AiCodeHelperHigherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class AiCodeHelperHigherImpl implements AiCodeHelperHigherService {
+public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
 
     /** 仅发图片无文字时的默认引导语 */
     private static final String DEFAULT_IMAGE_PROMPT =

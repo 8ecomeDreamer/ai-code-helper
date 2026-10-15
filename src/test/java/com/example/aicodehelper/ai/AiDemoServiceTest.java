@@ -1,13 +1,13 @@
 package com.example.aicodehelper.ai;
 
-import com.example.aicodehelper.ai.app.service.AiCodeHelperService;
+import com.example.aicodehelper.ai.app.AiCodeHelperService;
 import dev.langchain4j.service.Result;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AiCodeHelperServiceTest {
+class AiDemoServiceTest {
 
     @Resource
     private AiCodeHelperService aiCodeHelperService;

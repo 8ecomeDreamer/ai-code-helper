@@ -1,4 +1,4 @@
-package com.example.aicodehelper.ai.app.service;
+package com.example.aicodehelper.ai.app;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.Result;

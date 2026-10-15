@@ -1,4 +1,4 @@
-package com.example.aicodehelper.ai.app.service;
+package com.example.aicodehelper.ai.app;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.multipart.MultipartFile;

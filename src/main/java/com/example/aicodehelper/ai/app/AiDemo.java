@@ -14,7 +14,7 @@ import jakarta.annotation.Resource;
 @Service
 @Slf4j
 @Tag(name = "AiCodeHelper", description = "一些AI小demo")
-public class AiCodeHelper {
+public class AiDemo {
 
     // 1.引入chatModel
     @Resource

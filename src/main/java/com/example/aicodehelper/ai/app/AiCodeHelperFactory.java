@@ -1,6 +1,5 @@
 package com.example.aicodehelper.ai.app;
 
-import com.example.aicodehelper.ai.app.service.AiCodeHelperService;
 import com.example.aicodehelper.ai.mcp.McpConfig;
 //import com.example.aicodehelper.ai.model.TextOnlyStreamingChatModel;
 import com.example.aicodehelper.ai.tools.MathTools;

@@ -1,7 +1,7 @@
 package com.example.aicodehelper.controller.ai;
 
-import com.example.aicodehelper.ai.app.service.AiCodeHelperHigherService;
-import com.example.aicodehelper.ai.app.service.AiCodeHelperService;
+import com.example.aicodehelper.ai.app.AiCodeHelperHigherService;
+import com.example.aicodehelper.ai.app.AiCodeHelperService;
 import com.example.aicodehelper.common.core.AiJson;
 import com.example.aicodehelper.common.utils.SecurityUtils;
 import com.example.aicodehelper.service.ai.ChatAttachmentService;
