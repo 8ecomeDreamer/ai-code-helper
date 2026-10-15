@@ -19,6 +19,11 @@ langChain4j:
       chat-model:
         model-name: qwen-max
         api-key:  ${LANGCHAIN4J_API_KEY}
+      multi-model:
+        model-name: qwen3-omni-flash
+        # PDF 理解仅 qwen3.8 系列支持，含 PDF 轮次自动切换
+        pdf-model-name: qwen3.8-flash
+        api-key:  ${LANGCHAIN4J_API_KEY}
       embedding-model:
         model-name: text-embedding-async-v1
         api-key:  ${LANGCHAIN4J_API_KEY}
@@ -27,7 +32,7 @@ langChain4j:
         api-key:  ${LANGCHAIN4J_API_KEY}
 mcp:
   baiduZP:
-    apiKey: ${BAIDUZP_API_KEY} # 百度智能云
+    apiKey: ${BAIDUZP_API_KEY:} # 百度智能云（缺失时跳过联网搜索 MCP，竞品调研自动降级）
 
 
 #  minio

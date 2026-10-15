@@ -1,6 +1,7 @@
 package com.example.aicodehelper.ai.app.service;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -18,15 +19,33 @@ import java.util.List;
 public interface AiCodeHelperHigherService {
 
     /**
-     * 多模态流式问答：图片（URL 或 base64 data URI）+ 文字 → 逐增量文本输出。
+     * 多模态流式问答：图片 + 文档 + 文字 → 逐增量文本输出。
+     *
+     * <p>图片走 content 的 image 键（URL 或 base64 data URI）；PDF 走 DashScope
+     * 「PDF理解」的 file_data 键（base64，仅 qwen3.8 系列模型支持，impl 自动切模型）；
+     * txt/md 解析为文本并入提问。</p>
      *
      * @param imageUrls 图片列表（支持 http URL 与 data:image/xxx;base64,xxx）
-     * @param prompt    用户文字提问（可为空，空时用默认引导语）
+     * @param files     文档附件（pdf/txt/md），可为空
+     * @param prompt   用户文字提问
      */
-    Flux<String> multiModelChat(List<String> imageUrls, String prompt);
+    Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt);
+
+    /** 仅图片便捷重载 */
+    default Flux<String> multiModelChat(List<String> imageUrls, String prompt) {
+        return multiModelChat(imageUrls, List.of(), prompt);
+    }
 
     /** 单图便捷重载 */
     default Flux<String> multiModelChat(String imageUrl, String prompt) {
-        return multiModelChat(List.of(imageUrl), prompt);
+        return multiModelChat(List.of(imageUrl), List.of(), prompt);
     }
+
+    /**
+     * 文档理解流式问答：以公网可访问的 PDF URL 列表提问（content 的 file_url 键）。
+     *
+     * @param fileUrls PDF 下载地址列表（需 DashScope 服务端可达）
+     * @param prompt   用户文字提问
+     */
+    Flux<String> fileMCPChat(List<String> fileUrls, String prompt);
 }

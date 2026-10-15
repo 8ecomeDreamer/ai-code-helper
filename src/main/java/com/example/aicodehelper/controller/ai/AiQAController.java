@@ -3,7 +3,9 @@ package com.example.aicodehelper.controller.ai;
 import com.example.aicodehelper.ai.app.service.AiCodeHelperHigherService;
 import com.example.aicodehelper.ai.app.service.AiCodeHelperService;
 import com.example.aicodehelper.common.core.AiJson;
+import com.example.aicodehelper.common.utils.SecurityUtils;
 import com.example.aicodehelper.service.ai.ChatAttachmentService;
+import com.example.aicodehelper.service.ai.ChatHistoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import reactor.core.publisher.Flux;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/ai")
@@ -31,6 +34,9 @@ public class AiQAController {
     @Resource
     private ChatAttachmentService chatAttachmentService;
 
+    @Resource
+    private ChatHistoryService chatHistoryService;
+
 
     /**
      * 纯文本综合问答（GET SSE，兼容浏览器 EventSource）。
@@ -41,7 +47,8 @@ public class AiQAController {
     @GetMapping("/chat")
     public Flux<ServerSentEvent<String>> chat(@RequestParam("memoryId") int memoryId,
                                               @RequestParam("message") String message) {
-        return toSse(aiCodeHelperService.chatStream(memoryId, message));
+        return toSse(persistRound(memoryId, message,
+                aiCodeHelperService.chatStream(memoryId, message), false));
     }
 
     /**
@@ -62,24 +69,59 @@ public class AiQAController {
         chatAttachmentService.persistUserMessage(memoryId, message, images, files);
 
         Flux<String> stream;
-        if (images != null && !images.isEmpty()) {
-            // 图片轮：走自定义高阶多模态 API（官方 SDK 流式）
+        boolean hasImages = images != null && !images.isEmpty();
+        boolean hasFiles = files != null && !files.isEmpty();
+        if (hasImages || hasFiles) {
+            // 图片/文档轮：走自定义高阶多模态 API（官方 SDK 流式，PDF 自动切 qwen3.8）
             List<String> dataUris = new ArrayList<>();
-            for (MultipartFile image : images) {
-                try {
-                    dataUris.add(toDataUri(image));
-                } catch (Exception e) {
-                    // 单张不可读跳过，不中断整轮问答
+            if (hasImages) {
+                for (MultipartFile image : images) {
+                    try {
+                        dataUris.add(toDataUri(image));
+                    } catch (Exception e) {
+                        // 单张不可读跳过，不中断整轮问答
+                    }
                 }
             }
-            stream = dataUris.isEmpty()
+            stream = dataUris.isEmpty() && !hasFiles
                     ? aiCodeHelperService.chatStream(memoryId, message)
-                    : aiCodeHelperHigherService.multiModelChat(dataUris, message);
+                    : aiCodeHelperHigherService.multiModelChat(dataUris, files, message);
         } else {
-            // 纯文本/仅文档轮：仍走 AiServices 声明式链路
+            // 纯文本轮：仍走 AiServices 声明式链路
             stream = aiCodeHelperService.chatStream(memoryId, message);
         }
-        return toSse(stream);
+        // user 轮已由 persistUserMessage 落库，此处只保障会话行并归档 assistant 回复
+        return toSse(persistRound(memoryId, message, stream, true));
+    }
+
+    /**
+     * 问答轮次落库：保障会话行 + user 消息（可选）+ 流式结束后整段归档 assistant 回复。
+     * 完成/中断/异常均归档已产出的内容，保证历史记录与用户所见一致。
+     *
+     * @param userRoundPersisted user 消息是否已落库（带附件轮由 ChatAttachmentService 写入）
+     */
+    private Flux<String> persistRound(long sessionId, String userMessage, Flux<String> stream,
+                                      boolean userRoundPersisted) {
+        chatHistoryService.ensureSession(sessionId, currentUserId(), userMessage);
+        if (!userRoundPersisted) {
+            chatHistoryService.saveUserMessage(sessionId, userMessage);
+        }
+        StringBuilder full = new StringBuilder();
+        AtomicBoolean saved = new AtomicBoolean(false);
+        return stream.doOnNext(full::append).doFinally(signal -> {
+            if (saved.compareAndSet(false, true) && full.length() > 0) {
+                chatHistoryService.saveAssistantReply(sessionId, full.toString());
+            }
+        });
+    }
+
+    /** /ai/** 免鉴权，未登录时返回 null（会话 user_id 置空） */
+    private Long currentUserId() {
+        try {
+            return SecurityUtils.getUserId();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** 上传图片转 base64 data URI（DashScope 多模态 content 的 image 字段支持该格式） */
