@@ -6,8 +6,9 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationP
 import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
 import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
-import com.example.aicodehelper.ai.app.AiCodeHelperHigherService;
+import com.example.aicodehelper.service.admin.CallStatisticsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 多模态流式问答的 DashScope 官方 SDK 实现（对应百炼「图像与视频理解」Java 示例）。
@@ -54,6 +57,10 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
     /** 视觉模型 apiKey，缺省复用文本模型的 key（嵌套占位符取默认值） */
     @Value("${langChain4j.community.dashscope.multi-model.api-key}")
     private String apiKey;
+
+    /** 调用统计（百炼用量落 ai_business_log，供后台 Dashboard 聚合） */
+    @Resource
+    private CallStatisticsService callStatisticsService;
 
     @Override
     @Tag(name = "multiModelChat", description = "多模态回复")
@@ -151,15 +158,41 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
                     .incrementalOutput(true) // 增量输出：每帧只含新增文本，前端可直接拼接
                     .build();
 
+            // 用量统计：末帧携带整轮 usage，doFinally 无论完成/异常/取消均落一条 model_call
+            long start = System.currentTimeMillis();
+            AtomicReference<MultiModalConversationResult> lastResult = new AtomicReference<>();
+            AtomicBoolean errored = new AtomicBoolean(false);
             // streamCall 返回 RxJava Flowable（实现 Reactive Streams Publisher），直接桥接 Flux
             return Flux.from(new MultiModalConversation().streamCall(param))
+                    .doOnNext(lastResult::set)
                     .map(this::deltaOf)
                     .filter(text -> !text.isEmpty())
-                    .doOnError(e -> log.error("多模态流式调用失败，model={}", model, e));
+                    .doOnError(e -> {
+                        errored.set(true);
+                        log.error("多模态流式调用失败，model={}", model, e);
+                    })
+                    .doFinally(signal -> recordUsage(model, start, lastResult.get(), errored.get()));
         } catch (Exception e) {
             // 构造参数/发起调用阶段的同步异常（NoApiKeyException 等）转为流错误
             log.error("多模态调用发起失败，model={}", model, e);
+            recordUsage(model, System.currentTimeMillis(), null, true);
             return Flux.error(e);
+        }
+    }
+
+    /** 多模态流用量落库：token 取末帧 usage（增量输出下部分帧可能缺 usage，取最后已知值） */
+    private void recordUsage(String model, long start, MultiModalConversationResult last, boolean failed) {
+        try {
+            Integer in = null;
+            Integer out = null;
+            if (last != null && last.getUsage() != null) {
+                in = last.getUsage().getInputTokens();
+                out = last.getUsage().getOutputTokens();
+            }
+            callStatisticsService.recordModelCall("综合问答·多模态", model,
+                    System.currentTimeMillis() - start, in, out, !failed);
+        } catch (Exception e) {
+            log.warn("记录多模态用量统计失败，model={}", model, e);
         }
     }
 

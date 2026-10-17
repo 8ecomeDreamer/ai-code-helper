@@ -20,6 +20,9 @@ public class TokenService {
 
     private static final String CLAIM_USER_ID = "user_id";
 
+    /** EventSource（GET SSE）无法携带自定义请求头时的令牌兜底参数名 */
+    private static final String TOKEN_QUERY_PARAM = "token";
+
     @Value("${token.header:Authorization}")
     private String header;
 
@@ -70,10 +73,22 @@ public class TokenService {
     }
 
     /**
-     * 从请求头中提取令牌（去掉 Bearer 前缀）
+     * 语义化别名：令牌可来自请求头或 token 查询参数（见 getTokenFromRequest），解析用户ID。
+     * 供 /ai/** 可选鉴权拦截器调用，与 getUserIdFromRequest 行为一致。
+     */
+    public Long getUserIdFromRequestOrParam(HttpServletRequest request) {
+        return getUserIdFromRequest(request);
+    }
+
+    /**
+     * 提取令牌（去掉 Bearer 前缀）：优先请求头，缺失时回退查询参数 token。
+     * 浏览器 EventSource 发起的 GET SSE 无法设置 Authorization 头，前端改用 ?token= 传递。
      */
     public String getTokenFromRequest(HttpServletRequest request) {
         String value = request.getHeader(header);
+        if (!StringUtils.hasText(value)) {
+            value = request.getParameter(TOKEN_QUERY_PARAM);
+        }
         if (!StringUtils.hasText(value)) {
             return null;
         }

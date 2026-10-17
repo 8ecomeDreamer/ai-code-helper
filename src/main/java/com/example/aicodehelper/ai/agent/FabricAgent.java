@@ -7,7 +7,7 @@ import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationR
 import com.alibaba.dashscope.common.MultiModalMessage;
 import com.alibaba.dashscope.common.Role;
 import com.example.aicodehelper.common.core.AiJson;
-import com.example.aicodehelper.service.ai.CallStatisticsService;
+import com.example.aicodehelper.service.admin.CallStatisticsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Resource;
 import java.util.List;
