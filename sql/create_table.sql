@@ -516,12 +516,16 @@ CREATE TABLE IF NOT EXISTS rag_document (
                               oss_url VARCHAR(512) COMMENT '访问链接',
                               kb_type VARCHAR(64) COMMENT '知识库分类：process/business/competitor',
                               status TINYINT COMMENT '0待解析，1解析完成，2解析失败',
+                              enabled TINYINT NOT NULL DEFAULT 1 COMMENT '启用：0-停用 1-启用',
                               chunk_ids TEXT COMMENT '向量切片ID列表',
                               create_by BIGINT,
                               create_time DATETIME,
                               update_time DATETIME,
                               deleted TINYINT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='RAG知识库文档表';
+
+-- 存量库补充 enabled 列（新建表已包含，仅旧表需执行）
+-- ALTER TABLE rag_document ADD COLUMN enabled TINYINT NOT NULL DEFAULT 1 COMMENT '启用：0-停用 1-启用' AFTER status;
 
 
 CREATE TABLE IF NOT EXISTS ai_business_log (
