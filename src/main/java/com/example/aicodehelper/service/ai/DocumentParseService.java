@@ -38,19 +38,35 @@ public class DocumentParseService {
         }
         String name = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(Locale.ROOT);
         try {
-            if (name.endsWith(".pdf")) {
-                return parsePdf(file.getBytes());
-            }
-            if (name.endsWith(".txt") || name.endsWith(".md")) {
-                return new String(file.getBytes(), StandardCharsets.UTF_8);
-            }
-            throw new IllegalArgumentException("仅支持 .txt / .md / .pdf 条款文件");
+            return parse(name, file.getBytes());
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
             log.warn("条款文档读取失败，file={}", name, e);
             throw new IllegalArgumentException("文件读取失败：" + e.getMessage());
         }
+    }
+
+    /**
+     * 按文件名后缀解析字节为纯文本（供知识库从 MinIO 取回字节后解析复用）。
+     *
+     * @param fileName 文件名（决定 txt/md/pdf 解析分支，大小写不敏感）
+     * @param bytes    文件字节
+     * @return 文档文本
+     * @throws IllegalArgumentException 类型不支持 / 解析失败
+     */
+    public String parse(String fileName, byte[] bytes) {
+        String name = fileName == null ? "" : fileName.toLowerCase(Locale.ROOT);
+        if (bytes == null || bytes.length == 0) {
+            throw new IllegalArgumentException("文件内容为空");
+        }
+        if (name.endsWith(".pdf")) {
+            return parsePdf(bytes);
+        }
+        if (name.endsWith(".txt") || name.endsWith(".md")) {
+            return new String(bytes, StandardCharsets.UTF_8);
+        }
+        throw new IllegalArgumentException("仅支持 .txt / .md / .pdf 文件");
     }
 
     /** PDF 文本层抽取；扫描件无文本层时给出明确指引 */
