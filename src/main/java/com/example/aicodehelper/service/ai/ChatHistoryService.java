@@ -47,6 +47,9 @@ public class ChatHistoryService {
      * 保障会话行存在：不存在则按指定 id 建行（id=memoryId，与对话记忆键保持一致）；
      * 已存在但标题仍为缺省值时，用首条提问更新标题。落库失败仅记日志，不影响问答。
      *
+     * <p>历史遗留会话可能因早期未解析令牌而 user_id 为空，本轮若解析到登录用户则回填归属，
+     * 使其重新出现在该用户的侧边栏历史记录中。</p>
+     *
      * @param sessionId    会话id（前端 memoryId）
      * @param userId       当前登录用户id，未登录传 null
      * @param firstMessage 本轮用户提问（用于生成标题）
@@ -66,9 +69,18 @@ public class ChatHistoryService {
                 aiChatSessionService.save(session);
                 return;
             }
+            boolean needUpdate = false;
+            // 回填归属：孤儿会话（user_id 为空）遇到已登录用户时补写 user_id
+            if (session.getUser_id() == null && userId != null) {
+                session.setUser_id(userId);
+                needUpdate = true;
+            }
             String title = session.getSession_title();
             if (title == null || title.isBlank() || DEFAULT_TITLE.equals(title)) {
                 session.setSession_title(titleOf(firstMessage));
+                needUpdate = true;
+            }
+            if (needUpdate) {
                 session.setUpdate_time(now);
                 aiChatSessionService.updateById(session);
             }

@@ -1,13 +1,13 @@
 package com.example.aicodehelper.controller.ai;
 
-import com.example.aicodehelper.ai.app.AiCodeHelperHigherService;
-import com.example.aicodehelper.ai.app.AiCodeHelperService;
+import com.example.aicodehelper.ai.agent.QaAgent;
 import com.example.aicodehelper.common.core.AiJson;
-import com.example.aicodehelper.common.utils.SecurityUtils;
+import com.example.aicodehelper.common.security.TokenService;
 import com.example.aicodehelper.service.ai.ChatAttachmentService;
 import com.example.aicodehelper.service.ai.ChatHistoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
@@ -26,16 +26,16 @@ public class AiQAController {
 
 
     @Resource
-    private AiCodeHelperService aiCodeHelperService;
-
-    @Resource
-    private AiCodeHelperHigherService aiCodeHelperHigherService;
+    private QaAgent qaAgent;
 
     @Resource
     private ChatAttachmentService chatAttachmentService;
 
     @Resource
     private ChatHistoryService chatHistoryService;
+
+    @Resource
+    private TokenService tokenService;
 
 
     /**
@@ -46,9 +46,10 @@ public class AiQAController {
      */
     @GetMapping("/chat")
     public Flux<ServerSentEvent<String>> chat(@RequestParam("memoryId") int memoryId,
-                                              @RequestParam("message") String message) {
+                                              @RequestParam("message") String message,
+                                              HttpServletRequest request) {
         return toSse(persistRound(memoryId, message,
-                aiCodeHelperService.chatStream(memoryId, message), false));
+                qaAgent.chatStream(memoryId, message), false, resolveUserId(request)));
     }
 
     /**
@@ -64,7 +65,8 @@ public class AiQAController {
             @RequestParam("memoryId") int memoryId,
             @RequestParam(name = "message", required = false, defaultValue = "") String message,
             @RequestParam(name = "images", required = false) List<MultipartFile> images,
-            @RequestParam(name = "files", required = false) List<MultipartFile> files) {
+            @RequestParam(name = "files", required = false) List<MultipartFile> files,
+            HttpServletRequest request) {
         // 有图片/文档时：先存 MinIO（cw-ai/{会话id}/）并写消息表+附件表，失败不中断问答
         chatAttachmentService.persistUserMessage(memoryId, message, images, files);
 
@@ -84,14 +86,14 @@ public class AiQAController {
                 }
             }
             stream = dataUris.isEmpty() && !hasFiles
-                    ? aiCodeHelperService.chatStream(memoryId, message)
-                    : aiCodeHelperHigherService.multiModelChat(dataUris, files, message);
+                    ? qaAgent.chatStream(memoryId, message)
+                    : qaAgent.multiModelChat(dataUris, files, message);
         } else {
             // 纯文本轮：仍走 AiServices 声明式链路
-            stream = aiCodeHelperService.chatStream(memoryId, message);
+            stream = qaAgent.chatStream(memoryId, message);
         }
         // user 轮已由 persistUserMessage 落库，此处只保障会话行并归档 assistant 回复
-        return toSse(persistRound(memoryId, message, stream, true));
+        return toSse(persistRound(memoryId, message, stream, true, resolveUserId(request)));
     }
 
     /**
@@ -99,10 +101,11 @@ public class AiQAController {
      * 完成/中断/异常均归档已产出的内容，保证历史记录与用户所见一致。
      *
      * @param userRoundPersisted user 消息是否已落库（带附件轮由 ChatAttachmentService 写入）
+     * @param userId             当前登录用户id（可为 null），用于会话归属，供历史记录按用户查询
      */
     private Flux<String> persistRound(long sessionId, String userMessage, Flux<String> stream,
-                                      boolean userRoundPersisted) {
-        chatHistoryService.ensureSession(sessionId, currentUserId(), userMessage);
+                                      boolean userRoundPersisted, Long userId) {
+        chatHistoryService.ensureSession(sessionId, userId, userMessage);
         if (!userRoundPersisted) {
             chatHistoryService.saveUserMessage(sessionId, userMessage);
         }
@@ -115,10 +118,16 @@ public class AiQAController {
         });
     }
 
-    /** /ai/** 免鉴权，未登录时返回 null（会话 user_id 置空） */
-    private Long currentUserId() {
+    /**
+     * 解析当前登录用户id。
+     *
+     * <p>/ai/** 免鉴权（不经过 JwtAuthInterceptor 装载 ThreadLocal），故直接从令牌解析：
+     * POST 走 Authorization 头，GET SSE 走 ?token= 查询参数（EventSource 无法设头）。
+     * 未登录或令牌非法返回 null。</p>
+     */
+    private Long resolveUserId(HttpServletRequest request) {
         try {
-            return SecurityUtils.getUserId();
+            return tokenService.getUserIdFromRequest(request);
         } catch (Exception e) {
             return null;
         }
@@ -150,23 +159,4 @@ public class AiQAController {
             return chunk;
         }
     }
-
-//    /**
-//     * 总路由：识别用户请求意图，返回应转发到的专属子 Agent / 接口。
-//     * 与 /ai/chat 同为公开入口（/ai/** 免鉴权），供综合问答页做「先分类再分发」。
-//     *
-//     * @param message 用户自然语言请求
-//     * @return data 为 {intent, label, endpoint, suggestion}
-//     */
-//    @GetMapping("/route")
-//    public Result route(@RequestParam("message") String message) {
-//        if (!StringUtils.hasText(message)) {
-//            return Result.error("message 不能为空");
-//        }
-//        try {
-//            return Result.success(intentRouterService.route(message));
-//        } catch (Exception e) {
-//            return Result.error("意图识别失败：" + e.getMessage());
-//        }
-//    }
 }
