@@ -1,8 +1,7 @@
 package com.example.aicodehelper.service.ai;
 
-import com.example.aicodehelper.common.core.AiJson;
+import com.example.aicodehelper.ai.agent.ComplianceAgent;
 import com.fasterxml.jackson.databind.JsonNode;
-import dev.langchain4j.model.chat.ChatModel;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service;
  * <p>两级审查 + 自洽汇总：</p>
  * <ol>
  *   <li>Java 规则引擎基线：10 类必备条款关键词匹配 + 4 类高风险表述正则（与前端 compliance.js 规则同构，确定性兜底）；</li>
- *   <li>大模型深度审查：generator 出初稿 → reflection 一轮对照原文纠偏（误判 passed / 漏检风险 / 意见脱离原文）；</li>
+ *   <li>大模型深度审查：generator 出初稿 → reflection 一轮对照原文纠偏（prompt 与模型 I/O 在 {@link ComplianceAgent}）；</li>
  *   <li>summary 一律在 Java 端按最终 items/risks 重算，保证计数与结论自洽；模型不可用时整体降级规则引擎。</li>
  * </ol>
  *
@@ -32,10 +31,7 @@ import org.springframework.stereotype.Service;
 public class ComplianceService {
 
     @Resource
-    private ChatModel myQwenChatModel;
-
-    /** 送入模型的条款文本上限（控制 token 成本） */
-    private static final int MAX_PROMPT_CHARS = 12000;
+    private ComplianceAgent complianceAgent;
 
     /** 必备条款规则（id/level/关键词/缺失与命中意见，与前端规则集一致） */
     private record Rule(String id, String name, String level, List<String> keywords, String missing, String present) {
@@ -114,29 +110,20 @@ public class ComplianceService {
     public Map<String, Object> check(String content) {
         List<Map<String, Object>> baselineItems = baselineItems(content);
         List<Map<String, Object>> baselineRisks = baselineRisks(content);
-        try {
-            JsonNode draft = AiJson.parseTree(myQwenChatModel.chat(generatorPrompt(content)));
-            Map<String, LlmItem> llmItems = parseLlmItems(draft);
-            if (llmItems != null) {
-                List<Map<String, Object>> llmRisks = parseLlmRisks(draft);
-                // Reflection 一轮：对照原文纠偏初稿，失败则沿用初稿
-                try {
-                    JsonNode revised = AiJson.parseTree(
-                            myQwenChatModel.chat(reflectionPrompt(content, draft == null ? "{}" : draft.toString())));
-                    Map<String, LlmItem> revisedItems = parseLlmItems(revised);
-                    if (revisedItems != null) {
-                        llmItems = revisedItems;
-                        llmRisks = parseLlmRisks(revised);
-                    }
-                } catch (Exception e) {
-                    log.warn("合规审查 reflection 轮失败，沿用初稿：{}", e.getMessage());
-                }
-                return report(mergeItems(baselineItems, llmItems), mergeRisks(baselineRisks, llmRisks), "llm");
+        JsonNode draft = complianceAgent.draft(content);
+        Map<String, LlmItem> llmItems = parseLlmItems(draft);
+        if (llmItems != null) {
+            List<Map<String, Object>> llmRisks = parseLlmRisks(draft);
+            // Reflection 一轮：对照原文纠偏初稿，失败则沿用初稿（Agent 内部已兜底 null）
+            JsonNode revised = complianceAgent.reflect(content, draft.toString());
+            Map<String, LlmItem> revisedItems = parseLlmItems(revised);
+            if (revisedItems != null) {
+                llmItems = revisedItems;
+                llmRisks = parseLlmRisks(revised);
             }
-            log.warn("合规审查模型输出无效，降级规则引擎");
-        } catch (Exception e) {
-            log.warn("合规审查模型调用失败，降级规则引擎：{}", e.getMessage());
+            return report(mergeItems(baselineItems, llmItems), mergeRisks(baselineRisks, llmRisks), "llm");
         }
+        log.warn("合规审查模型不可用或输出无效，降级规则引擎");
         return report(baselineItems, baselineRisks, "rules");
     }
 
@@ -309,38 +296,5 @@ public class ComplianceService {
         report.put("summary", summary);
         report.put("source", source);
         return report;
-    }
-
-    /* ---------------- Prompt ---------------- */
-
-    private String generatorPrompt(String content) {
-        return """
-                你是纺织外贸行业的合同合规审查专家，请逐条审查下面的合同条款，输出合规审查报告。
-                审查维度固定为 10 个必备条款项（id 不可更改）：composition 成分标注 / incoterms 贸易术语 / inspection 检验标准 / payment 支付 / delivery 交期与延迟责任 / force-majeure 不可抗力 / dispute 争议解决 / ip-confidential 知识产权与保密 / packing 包装与唛头 / quantity-tolerance 数量溢短装。
-                每项给出 passed（条款是否实质覆盖该维度，仅看原文依据，不得臆断）与 detail（一句审查意见；未覆盖时说明风险与修订建议）。
-                risks 为高风险表述（如无限责任、对方单方面变更授权、违约金≥10%、发货前 100% 全款预付等），每项 {id,name,advice,hits}，hits 为原文摘录（最多 3 条）；没有则空数组。
-                只输出一个 JSON 对象，不要解释、不要代码围栏：
-                {"items":[{"id","name","level","passed":布尔,"detail"}],"risks":[{"id","name","advice","hits":[]}]}
-                合同条款：
-                <<<
-                %s
-                >>>
-                """.formatted(abbreviate(content));
-    }
-
-    private String reflectionPrompt(String content, String draft) {
-        return """
-                下面是合同条款原文与一份合规审查初稿。请对照原文复核初稿：passed 判定是否有原文依据、是否漏检高风险表述、detail 是否脱离原文，并输出修订后的完整 JSON（结构不变：{items,risks}，只输出 JSON）。
-                [初稿]
-                %s
-                [原文]
-                <<<
-                %s
-                >>>
-                """.formatted(draft, abbreviate(content));
-    }
-
-    private String abbreviate(String content) {
-        return content.length() > MAX_PROMPT_CHARS ? content.substring(0, MAX_PROMPT_CHARS) + "\n...(条款过长已截断)" : content;
     }
 }

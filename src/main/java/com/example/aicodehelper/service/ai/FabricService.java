@@ -1,24 +1,19 @@
 package com.example.aicodehelper.service.ai;
 
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationOutput;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationParam;
-import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversationResult;
-import com.alibaba.dashscope.common.MultiModalMessage;
-import com.alibaba.dashscope.common.Role;
-import com.example.aicodehelper.common.core.AiJson;
+import com.example.aicodehelper.ai.agent.FabricAgent;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * 面料疵点检测服务：复用综合问答图片链路的 DashScope 多模态通道（MultiModalConversation 同步调用）。
+ * 面料疵点检测服务（应用编排层）：两段式视觉审查的 prompt 与 DashScope 多模态调用在
+ * {@link FabricAgent}，本服务只负责 dataUri 拼装、报告规整与错误信封。
  *
  * <p>两段式视觉审查：</p>
  * <ol>
@@ -26,8 +21,7 @@ import org.springframework.stereotype.Service;
  *   <li>疵点检测：按四分制逐类检查断纬/断经、油污/渍痕、色差/色花、破洞/稀密路、竹节纱/棉结，输出 defects + verdict。</li>
  * </ol>
  *
- * <p>模型名读 multi-model 配置（本 Key 渠道 qwen-vl-max 未开通会 404，qwen3-omni-flash 已验证可用）；
- * 模型侧报错原文透出到 message，不再吞成通用文案。</p>
+ * <p>模型侧报错原文透出到 message，不再吞成通用文案。</p>
  *
  * <p>输出形状与前端 FabricView 契约一致：
  * {status: done|error, title, message, report?: {defects[{name,position,grade}], verdict}}。</p>
@@ -36,25 +30,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class FabricService {
 
-    /** 视觉模型名：与综合问答图片链路共用 multi-model 配置 */
-    @Value("${langChain4j.community.dashscope.multi-model.model-name}")
-    private String visionModelName;
-
-    @Value("${langChain4j.community.dashscope.multi-model.api-key}")
-    private String apiKey;
-
-    private static final String GATE_PROMPT = """
-            你是纺织品检验专家。请判断图片是否为面料/纺织品（梭织、针织、牛仔、印花布等）的实物特写照片。
-            只输出一个 JSON 对象，不要解释、不要代码围栏：
-            {"isFabric": true或false, "reason": "一句判定依据"}
-            """;
-
-    private static final String DETECT_PROMPT = """
-            你是纺织品质检专家，按四分制检验图片中的布面质量。逐类检查常见疵点：断纬/断经、油污/渍痕、色差/色花、破洞/稀密路、竹节纱/棉结。
-            只输出一个 JSON 对象，不要解释、不要代码围栏：
-            {"defects":[{"name":"疵点名称","position":"图中位置描述（如 左中部 (x:120, y:340)）","grade":"严重程度 A/B/C（A 轻微、B 中等、C 严重）"}],"verdict":"一句综合评定，如 B 级品 · 建议降级处理或修复后复检"}
-            未发现任何疵点时 defects 为空数组，verdict 给出 A 级评定。
-            """;
+    @Resource
+    private FabricAgent fabricAgent;
 
     /**
      * 面料疵点检测。
@@ -70,7 +47,7 @@ public class FabricService {
         // 第一段：门禁判定，非面料图片不进入疵点检测
         JsonNode gate;
         try {
-            gate = AiJson.parseTree(callVision(dataUri, GATE_PROMPT));
+            gate = fabricAgent.gate(dataUri);
         } catch (Exception e) {
             log.warn("面料门禁判定调用失败：{}", e.getMessage());
             return error("检测服务不可用", "视觉模型调用失败：" + rawMessage(e));
@@ -84,7 +61,7 @@ public class FabricService {
         // 第二段：疵点检测
         JsonNode reportNode;
         try {
-            reportNode = AiJson.parseTree(callVision(dataUri, DETECT_PROMPT));
+            reportNode = fabricAgent.detect(dataUri);
         } catch (Exception e) {
             log.warn("疵点检测调用失败：{}", e.getMessage());
             return error("检测失败", "视觉模型调用失败：" + rawMessage(e));
@@ -104,37 +81,6 @@ public class FabricService {
                 : "视觉模型已完成布面审查，疵点定位与等级如下，综合评定见报告尾部。");
         result.put("report", report);
         return result;
-    }
-
-    /** 同步多模态调用：一张图 + 一段指令，返回模型全文文本 */
-    private String callVision(String dataUri, String prompt) throws Exception {
-        List<Map<String, Object>> contents = List.of(Map.of("image", dataUri), Map.of("text", prompt));
-        MultiModalMessage userMessage = MultiModalMessage.builder()
-                .role(Role.USER.getValue())
-                .content(contents)
-                .build();
-        MultiModalConversationParam param = MultiModalConversationParam.builder()
-                .apiKey(apiKey)
-                .model(visionModelName)
-                .messages(List.of(userMessage))
-                .incrementalOutput(false) // 非流式：单帧返回全文，便于 JSON 解析
-                .build();
-        MultiModalConversationResult result = new MultiModalConversation().call(param);
-        if (result == null || result.getOutput() == null) {
-            throw new IllegalStateException("视觉模型返回空结果");
-        }
-        List<MultiModalConversationOutput.Choice> choices = result.getOutput().getChoices();
-        if (choices == null || choices.isEmpty() || choices.get(0).getMessage() == null) {
-            throw new IllegalStateException("视觉模型返回空 choices");
-        }
-        StringBuilder text = new StringBuilder();
-        for (Map<String, Object> content : choices.get(0).getMessage().getContent()) {
-            Object value = content.get("text");
-            if (value != null) {
-                text.append(value);
-            }
-        }
-        return text.toString();
     }
 
     /** 规整模型报告：defects 字段兜底、grade 归一 A/B/C、verdict 缺失时按最重等级生成 */
