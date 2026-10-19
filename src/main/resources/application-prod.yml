@@ -37,7 +37,7 @@ mcp:
 
 #  minio
 minio:
-  endpoint: http://127.0.0.1:9000
+  endpoint: ${minio_endpoint}
   access-key: ${minio_user}
   secret-key: ${minio_password}
   bucket-name: cw-ai
