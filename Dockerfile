@@ -1,5 +1,6 @@
 # ---------------------- 构建阶段 ----------------------
-FROM maven:3.9.8-eclipse-temurin-21 AS builder
+# FROM maven:3.9.8-eclipse-temurin-21 AS builder
+FROM maven:3.8-openjdk-17 AS builder
 WORKDIR /app
 
 # 优先复制pom.xml，缓存依赖层（加速构建）
