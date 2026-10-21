@@ -27,18 +27,26 @@ public interface AiCodeHelperHigherService {
      *
      * @param imageUrls 图片列表（支持 http URL 与 data:image/xxx;base64,xxx）
      * @param files     文档附件（pdf/txt/md），可为空
-     * @param prompt   用户文字提问
+     * @param prompt    用户文字提问
+     * @param sessionId 会话id（写 model_call 统计归属，可为 null）
+     * @param userId    归属用户id（写 model_call 统计供按用户限额，可为 null）
      */
-    Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt);
+    Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt,
+                                Long sessionId, Long userId);
+
+    /** 无归属信息的便捷重载 */
+    default Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt) {
+        return multiModelChat(imageUrls, files, prompt, null, null);
+    }
 
     /** 仅图片便捷重载 */
     default Flux<String> multiModelChat(List<String> imageUrls, String prompt) {
-        return multiModelChat(imageUrls, List.of(), prompt);
+        return multiModelChat(imageUrls, List.of(), prompt, null, null);
     }
 
     /** 单图便捷重载 */
     default Flux<String> multiModelChat(String imageUrl, String prompt) {
-        return multiModelChat(List.of(imageUrl), List.of(), prompt);
+        return multiModelChat(List.of(imageUrl), List.of(), prompt, null, null);
     }
 
     /**

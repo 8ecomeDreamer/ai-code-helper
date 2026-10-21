@@ -58,13 +58,14 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
     @Value("${langChain4j.community.dashscope.multi-model.api-key}")
     private String apiKey;
 
-    /** 调用统计（百炼用量落 ai_business_log，供后台 Dashboard 聚合） */
+    /** 调用统计（百炼用量落 ai_business_log，供后台 Dashboard 聚合与按用户限额） */
     @Resource
     private CallStatisticsService callStatisticsService;
 
     @Override
     @Tag(name = "multiModelChat", description = "多模态回复")
-    public Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt) {
+    public Flux<String> multiModelChat(List<String> imageUrls, List<MultipartFile> files, String prompt,
+                                       Long sessionId, Long userId) {
         List<String> images = imageUrls == null ? List.of() : imageUrls;
         List<MultipartFile> docs = files == null ? List.of() : files;
         if (images.isEmpty() && docs.isEmpty()) {
@@ -122,7 +123,7 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
 
         // 含 PDF 必须切 qwen3.8 系列（vl/omni 模型不收 PDF）
         String model = hasPdf ? pdfModelName : visionModelName;
-        return stream(contents, model);
+        return stream(contents, model, sessionId, userId);
     }
 
     @Override
@@ -140,12 +141,13 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
         Map<String, Object> textContent = new HashMap<>();
         textContent.put("text", prompt == null || prompt.isBlank() ? "请总结这份文档的核心内容。" : prompt);
         contents.add(textContent);
-        return stream(contents, pdfModelName);
+        return stream(contents, pdfModelName, null, null);
     }
 
     /** 拼装多模态消息并发起增量流式调用，Flowable 桥接 Flux 逐增量文本下发 */
     @Tag(name = "stream", description = "拼装多模态消息并发起增量流式调用")
-    private Flux<String> stream(List<Map<String, Object>> contents, String model) {
+    private Flux<String> stream(List<Map<String, Object>> contents, String model,
+                                Long sessionId, Long userId) {
         MultiModalMessage userMessage = MultiModalMessage.builder()
                 .role(Role.USER.getValue())
                 .content(contents)
@@ -171,17 +173,18 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
                         errored.set(true);
                         log.error("多模态流式调用失败，model={}", model, e);
                     })
-                    .doFinally(signal -> recordUsage(model, start, lastResult.get(), errored.get()));
+                    .doFinally(signal -> recordUsage(model, start, lastResult.get(), errored.get(), sessionId, userId));
         } catch (Exception e) {
             // 构造参数/发起调用阶段的同步异常（NoApiKeyException 等）转为流错误
             log.error("多模态调用发起失败，model={}", model, e);
-            recordUsage(model, System.currentTimeMillis(), null, true);
+            recordUsage(model, System.currentTimeMillis(), null, true, sessionId, userId);
             return Flux.error(e);
         }
     }
 
-    /** 多模态流用量落库：token 取末帧 usage（增量输出下部分帧可能缺 usage，取最后已知值） */
-    private void recordUsage(String model, long start, MultiModalConversationResult last, boolean failed) {
+    /** 多模态流用量落库：token 取末帧 usage（增量输出下部分帧可能缺 usage，取最后已知值），并记会话/用户归属 */
+    private void recordUsage(String model, long start, MultiModalConversationResult last, boolean failed,
+                             Long sessionId, Long userId) {
         try {
             Integer in = null;
             Integer out = null;
@@ -190,7 +193,7 @@ public class AiCodeHelperHigherFactory implements AiCodeHelperHigherService {
                 out = last.getUsage().getOutputTokens();
             }
             callStatisticsService.recordModelCall("综合问答·多模态", model,
-                    System.currentTimeMillis() - start, in, out, !failed);
+                    System.currentTimeMillis() - start, in, out, !failed, sessionId, userId);
         } catch (Exception e) {
             log.warn("记录多模态用量统计失败，model={}", model, e);
         }

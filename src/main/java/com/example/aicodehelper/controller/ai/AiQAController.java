@@ -3,8 +3,10 @@ package com.example.aicodehelper.controller.ai;
 import com.example.aicodehelper.ai.agent.QaAgent;
 import com.example.aicodehelper.common.core.AiJson;
 import com.example.aicodehelper.common.security.TokenService;
+import com.example.aicodehelper.service.admin.QuotaService;
 import com.example.aicodehelper.service.ai.ChatAttachmentService;
 import com.example.aicodehelper.service.ai.ChatHistoryService;
+import com.example.aicodehelper.service.ai.KeywordRewriteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,6 +39,12 @@ public class AiQAController {
     @Resource
     private TokenService tokenService;
 
+    @Resource
+    private QuotaService quotaService;
+
+    @Resource
+    private KeywordRewriteService keywordRewriteService;
+
 
     /**
      * 纯文本综合问答（GET SSE，兼容浏览器 EventSource）。
@@ -48,8 +56,15 @@ public class AiQAController {
     public Flux<ServerSentEvent<String>> chat(@RequestParam("memoryId") int memoryId,
                                               @RequestParam("message") String message,
                                               HttpServletRequest request) {
+        Long userId = resolveUserId(request);
+        // 按用户当日 token 预算拦截（超限直接回一帧提示，不再发起模型调用）
+        if (quotaService.overBudget(userId)) {
+            return Flux.just(quotaFrame());
+        }
+        // 关键词术语映射改写只作用于发给模型的查询串，历史仍存原文
+        String effective = keywordRewriteService.rewrite(message);
         return toSse(persistRound(memoryId, message,
-                qaAgent.chatStream(memoryId, message), false, resolveUserId(request)));
+                qaAgent.chatStream(memoryId, effective, userId), false, userId));
     }
 
     /**
@@ -67,9 +82,15 @@ public class AiQAController {
             @RequestParam(name = "images", required = false) List<MultipartFile> images,
             @RequestParam(name = "files", required = false) List<MultipartFile> files,
             HttpServletRequest request) {
+        Long userId = resolveUserId(request);
+        // 文档/图片多模态轮消耗巨大，入口先按预算拦截，超限不落附件、不发起模型调用
+        if (quotaService.overBudget(userId)) {
+            return Flux.just(quotaFrame());
+        }
         // 有图片/文档时：先存 MinIO（cw-ai/{会话id}/）并写消息表+附件表，失败不中断问答
         chatAttachmentService.persistUserMessage(memoryId, message, images, files);
 
+        String effective = keywordRewriteService.rewrite(message);
         Flux<String> stream;
         boolean hasImages = images != null && !images.isEmpty();
         boolean hasFiles = files != null && !files.isEmpty();
@@ -86,14 +107,14 @@ public class AiQAController {
                 }
             }
             stream = dataUris.isEmpty() && !hasFiles
-                    ? qaAgent.chatStream(memoryId, message)
-                    : qaAgent.multiModelChat(dataUris, files, message);
+                    ? qaAgent.chatStream(memoryId, effective, userId)
+                    : qaAgent.multiModelChat(dataUris, files, effective, memoryId, userId);
         } else {
             // 纯文本轮：仍走 AiServices 声明式链路
-            stream = qaAgent.chatStream(memoryId, message);
+            stream = qaAgent.chatStream(memoryId, effective, userId);
         }
         // user 轮已由 persistUserMessage 落库，此处只保障会话行并归档 assistant 回复
-        return toSse(persistRound(memoryId, message, stream, true, resolveUserId(request)));
+        return toSse(persistRound(memoryId, message, stream, true, userId));
     }
 
     /**
@@ -149,6 +170,14 @@ public class AiQAController {
             String frame = encodeFrame(chunk);
             return ServerSentEvent.builder(frame).data(frame).build();
         });
+    }
+
+    /** 超预算提示帧（复用增量文本协议，前端按普通回复渲染） */
+    private ServerSentEvent<String> quotaFrame() {
+        String tip = "⚠️ 今日 token 用量已达上限（预算 " + quotaService.dailyTokenBudget()
+                + " tokens），请明天再试或联系管理员调整额度。";
+        String frame = encodeFrame(tip);
+        return ServerSentEvent.builder(frame).data(frame).build();
     }
 
     /** 增量文本转 JSON 帧；序列化异常时降级为原文 */

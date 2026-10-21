@@ -2,8 +2,10 @@ package com.example.aicodehelper.controller.ai;
 
 import com.alibaba.dashscope.audio.asr.recognition.Recognition;
 import com.alibaba.dashscope.audio.asr.recognition.RecognitionParam;
+import com.example.aicodehelper.common.core.AiJson;
 import com.example.aicodehelper.common.core.Result;
 import com.example.aicodehelper.service.admin.CallStatisticsService;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -62,8 +64,10 @@ public class AsrController {
                     .sampleRate(16000)
                     .apiKey(apiKey)
                     .build();
-            // 同步整段识别：SDK 读文件分帧上行，返回拼接后的完整文本
-            String text = new Recognition().call(param, temp);
+            // 同步整段识别：SDK 返回聚合结果 JSON（含 sentences 数组），
+            // 需抽取每句 text 拼接为纯文本；旧版直出纯文本时降级原样返回
+            String raw = new Recognition().call(param, temp);
+            String text = extractAsrText(raw);
             callStatisticsService.recordModelCall("语音识别", asrModelName,
                     System.currentTimeMillis() - start, null, null, true);
             return Result.success(Map.of("text", text == null ? "" : text));
@@ -82,5 +86,35 @@ public class AsrController {
                 }
             }
         }
+    }
+
+    /**
+     * 从 paraformer 返回体中抽取纯文本。
+     *
+     * <p>识别结果为形如 {@code {"sentences":[{"text":"..."},...]}} 的 JSON，
+     * 逐句拼接 sentences[].text；无法解析（例如 SDK 版本直接返回纯文本）时原样返回。</p>
+     */
+    private String extractAsrText(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "";
+        }
+        JsonNode root = AiJson.parseTree(raw);
+        if (root == null) {
+            return raw.trim();
+        }
+        JsonNode sentences = root.path("sentences");
+        if (sentences.isArray() && !sentences.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (JsonNode sentence : sentences) {
+                sb.append(sentence.path("text").asText(""));
+            }
+            String joined = sb.toString().trim();
+            if (!joined.isEmpty()) {
+                return joined;
+            }
+        }
+        // 兜底：单句结构 {text:"..."}
+        String single = root.path("text").asText("");
+        return single.isBlank() ? raw.trim() : single;
     }
 }

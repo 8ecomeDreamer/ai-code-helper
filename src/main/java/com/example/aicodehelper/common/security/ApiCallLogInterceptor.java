@@ -9,7 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * 模块 API 调用统计拦截器：preHandle 记起始时间，afterCompletion 按路径前缀识别业务模块，
- * 将调用量/状态码/耗时异步落 ai_business_log（log_type=api_call）。
+ * 将调用量/状态码/耗时/会话/用户异步落 ai_business_log（log_type=api_call）。
  *
  * <p>注册范围见 WebMvcConfig；未命中模块映射的路径直接跳过，不影响其余请求。</p>
  */
@@ -21,6 +21,9 @@ public class ApiCallLogInterceptor implements HandlerInterceptor {
 
     @Resource
     private CallStatisticsService callStatisticsService;
+
+    @Resource
+    private TokenService tokenService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -38,7 +41,33 @@ public class ApiCallLogInterceptor implements HandlerInterceptor {
         Object start = request.getAttribute(ATTR_START);
         long cost = start instanceof Long ? System.currentTimeMillis() - (Long) start : 0L;
         callStatisticsService.recordApiCall(module, response.getStatus(), cost,
-                request.getMethod() + " " + request.getRequestURI());
+                request.getMethod() + " " + request.getRequestURI(),
+                resolveSessionId(request), resolveUserId(request));
+    }
+
+    /** 会话id：综合问答以 memoryId 传递（GET query / POST form 均可 getParameter），兼容 sessionId 命名 */
+    private Long resolveSessionId(HttpServletRequest request) {
+        String raw = request.getParameter("memoryId");
+        if (raw == null || raw.isBlank()) {
+            raw = request.getParameter("sessionId");
+        }
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return Long.parseLong(raw.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /** 归属用户id：/ai/** 免鉴权，令牌合法才解析（POST 走 Authorization 头，GET SSE 走 ?token=），匿名返回 null */
+    private Long resolveUserId(HttpServletRequest request) {
+        try {
+            return tokenService.getUserIdFromRequest(request);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** URI 前缀 → 模块名（context-path=/api 也在 URI 里，用 contains 匹配业务段） */

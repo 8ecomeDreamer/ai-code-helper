@@ -34,13 +34,19 @@ public class AiBusinessLog implements Serializable {
     private Long message_id;
 
     /**
+     * 归属用户ID sys_user.user_id（api_call/model_call 统计写入，供后台按用户聚合用量与限额）
+     */
+    @TableField(value = "user_id")
+    private Long user_id;
+
+    /**
      * Agent名称：PlanAndExecuteAgent / ReActAgent / ReflectionAgent
      */
     @TableField(value = "agent_name")
     private String agent_name;
 
     /**
-     * 日志类型：plan / tool_call / reflection / dispatch
+     * 日志类型：plan / tool_call / reflection / dispatch / api_call / model_call
      */
     @TableField(value = "log_type")
     private String log_type;
