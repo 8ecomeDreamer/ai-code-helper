@@ -530,13 +530,15 @@ CREATE TABLE IF NOT EXISTS rag_document (
 
 CREATE TABLE IF NOT EXISTS ai_business_log (
                                  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                 user_id BIGINT COMMENT 'owner user id',
                                  session_id BIGINT COMMENT '会话ID ai_chat_session.id',
                                  message_id BIGINT COMMENT '消息ID ai_chat_shturl.cc/',
                                  agent_name VARCHAR(128) COMMENT 'Agent名称：PlanAndExecuteAgent / ReActAgent / ReflectionAgent',
                                  log_type VARCHAR(64) COMMENT '日志类型：plan / tool_call / reflection / dispatch',
                                  log_content TEXT COMMENT '日志详情',
                                  cost_ms BIGINT COMMENT '耗时毫秒',
-                                 create_time DATETIME
+                                 create_time DATETIME,
+                                 KEY idx_business_log_user_time (user_id, create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI Agent业务执行日志';
 
 
