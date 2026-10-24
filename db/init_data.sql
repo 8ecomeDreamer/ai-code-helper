@@ -167,6 +167,33 @@ insert into sys_notice values('1', '纺织智能体系统上线通知', '1', '<p
 -- ----------------------------
 -- 初始化-布号主数据（ERP 面料成本五项拆分，智能报价下拉与邮件生成数据源）
 -- ----------------------------
+-- ----------------------------
+-- 初始化模型管理：与 application-*.yml 当前接入保持一致
+-- 额度与到期时间为首次安装的示例值，请在「模型管理」按百炼控制台实际额度调整
+-- ----------------------------
+insert into ai_model
+(platform_code, platform_name, model_name, model_code, model_type, base_url, api_key,
+ temperature, max_tokens, quota_total, usage_unit, expire_time, is_current, status, remark)
+values
+('bailian', '阿里云百炼', '通义千问 Max', 'qwen-max', 'chat',
+ 'https://dashscope.aliyuncs.com/compatible-mode/v1', '', 0.70, 2048, 1000000, 'tokens',
+ date_add(sysdate(), interval 30 day), 1, 1, '文本对话主模型，对应 application chat-model'),
+('bailian', '阿里云百炼', 'Qwen Omni Flash', 'qwen3-omni-flash', 'multimodal',
+ 'https://dashscope.aliyuncs.com', '', 0.70, 4096, 800000, 'tokens',
+ date_add(sysdate(), interval 30 day), 1, 1, '综合问答图片与面料识别，对应 application multi-model'),
+('bailian', '阿里云百炼', 'Qwen3.8 Flash', 'qwen3.8-flash', 'pdf',
+ 'https://dashscope.aliyuncs.com', '', 0.70, 4096, 500000, 'tokens',
+ date_add(sysdate(), interval 30 day), 1, 1, 'PDF 文档理解，对应 application pdf-model-name'),
+('bailian', '阿里云百炼', 'Text Embedding Async', 'text-embedding-async-v1', 'embedding',
+ 'https://dashscope.aliyuncs.com', '', 0.70, 2048, 2000000, 'tokens',
+ date_add(sysdate(), interval 30 day), 1, 1, '知识库向量化，对应 application embedding-model'),
+('bailian', '阿里云百炼', '通义千问 Max 流式', 'qwen-max', 'streaming',
+ 'https://dashscope.aliyuncs.com/compatible-mode/v1', '', 0.70, 2048, 1000000, 'tokens',
+ date_add(sysdate(), interval 30 day), 1, 1, '流式输出，对应 application streaming-chat-model'),
+('bailian', '阿里云百炼', 'Paraformer Realtime', 'paraformer-realtime-v2', 'asr',
+ 'https://dashscope.aliyuncs.com', '', 0.70, 2048, 10000, 'times',
+ date_add(sysdate(), interval 30 day), 1, 1, '语音识别，对应 asr.model-name');
+
 insert into ai_fabric_item (fabric_code, fabric_name, fabric_name_en, composition, spec, weight, width, cost_material, cost_process, cost_dyeing, cost_test, cost_packing, lead_time, moq, status) values
 ('CW-2101', '全棉府绸', 'Cotton Poplin', '100% Cotton', '40x40 133x72', '120 GSM', '57/58"', 6.80, 1.60, 1.90, 0.40, 0.50, 25, 1000, 1),
 ('CW-3205', '涤棉斜纹卡', 'T/C Twill', '65% Polyester 35% Cotton', '32x32 130x70', '180 GSM', '63"', 5.60, 1.40, 1.60, 0.35, 0.45, 20, 2000, 1),

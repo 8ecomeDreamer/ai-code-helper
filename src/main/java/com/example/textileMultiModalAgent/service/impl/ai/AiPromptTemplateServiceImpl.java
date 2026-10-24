@@ -2,7 +2,7 @@ package com.example.textileMultiModalAgent.service.impl.ai;
 
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.example.textileMultiModalAgent.domain.AiPromptTemplate;
-import com.example.textileMultiModalAgent.service.ai.AiPromptTemplateService;
+import com.example.textileMultiModalAgent.service.admin.AiPromptTemplateService;
 import com.example.textileMultiModalAgent.mapper.AiPromptTemplateMapper;
 import org.springframework.stereotype.Service;
 

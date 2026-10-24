@@ -3,7 +3,7 @@ package com.example.textileMultiModalAgent.service.impl.ai;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.example.textileMultiModalAgent.domain.AiBusinessLog;
 import com.example.textileMultiModalAgent.mapper.AiBusinessLogMapper;
-import com.example.textileMultiModalAgent.service.ai.AiBusinessLogService;
+import com.example.textileMultiModalAgent.service.admin.AiBusinessLogService;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,4 +1,4 @@
-package com.example.textileMultiModalAgent.ai.app;
+package com.example.textileMultiModalAgent.service.ai;
 
 /**
  * 竞品调研 Assistant。

@@ -594,3 +594,30 @@ CREATE TABLE IF NOT EXISTS ai_fabric_item (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='布号主数据表（ERP 面料成本，智能报价用）';
 
 CREATE INDEX idx_fabric_item_status ON ai_fabric_item(status, deleted);
+
+
+-- AI 模型管理：平台、类型、额度、到期时间与当前使用状态
+CREATE TABLE IF NOT EXISTS ai_model (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    platform_code   VARCHAR(32)   NOT NULL DEFAULT 'bailian' COMMENT '平台编码：bailian/openai/zhipu 等',
+    platform_name   VARCHAR(64)   NOT NULL DEFAULT '阿里云百炼' COMMENT '平台展示名称',
+    model_name      VARCHAR(128)  NOT NULL COMMENT '模型展示名称',
+    model_code      VARCHAR(128)  NOT NULL COMMENT '模型编码',
+    model_type      VARCHAR(32)   NOT NULL DEFAULT 'chat' COMMENT '类型：chat/multimodal/pdf/embedding/streaming/asr',
+    base_url        VARCHAR(512)  DEFAULT '' COMMENT '接口地址',
+    api_key         VARCHAR(512)  DEFAULT '' COMMENT '接口密钥（如由环境变量注入可不填）',
+    temperature     DECIMAL(3,2)  DEFAULT 0.70 COMMENT '温度',
+    max_tokens      INT           DEFAULT 2048 COMMENT '最大输出 token',
+    quota_total     BIGINT        NOT NULL DEFAULT 0 COMMENT '周期额度，0 表示未配置',
+    usage_unit      VARCHAR(16)   NOT NULL DEFAULT 'tokens' COMMENT '额度单位：tokens/times',
+    expire_time     DATETIME      NULL COMMENT '到期时间',
+    is_current      TINYINT       NOT NULL DEFAULT 0 COMMENT '当前使用：0-否 1-是',
+    status          TINYINT       NOT NULL DEFAULT 1 COMMENT '状态：0-停用 1-启用',
+    remark          VARCHAR(500)  DEFAULT '' COMMENT '备注',
+    create_time     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted         TINYINT       NOT NULL DEFAULT 0 COMMENT '逻辑删除：0-否 1-是',
+    UNIQUE KEY uk_ai_model_platform_type (platform_code, model_code, model_type),
+    KEY idx_ai_model_type_current (model_type, is_current),
+    KEY idx_ai_model_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI 大模型接入与额度配置表';

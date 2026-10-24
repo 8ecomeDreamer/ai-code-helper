@@ -2,7 +2,6 @@ package com.example.textileMultiModalAgent.service.admin;
 
 import com.example.textileMultiModalAgent.common.core.AiJson;
 import com.example.textileMultiModalAgent.domain.AiBusinessLog;
-import com.example.textileMultiModalAgent.service.ai.AiBusinessLogService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

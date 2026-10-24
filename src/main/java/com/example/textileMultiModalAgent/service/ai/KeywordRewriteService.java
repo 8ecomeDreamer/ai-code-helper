@@ -1,6 +1,7 @@
 package com.example.textileMultiModalAgent.service.ai;
 
 import com.example.textileMultiModalAgent.domain.AiKeywordMapping;
+import com.example.textileMultiModalAgent.service.admin.AiKeywordMappingService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

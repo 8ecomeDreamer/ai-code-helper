@@ -1,6 +1,6 @@
 package com.example.textileMultiModalAgent.ai.agent;
 
-import com.example.textileMultiModalAgent.ai.app.ResearchAssistant;
+import com.example.textileMultiModalAgent.service.ai.ResearchAssistant;
 import com.example.textileMultiModalAgent.common.core.AiJson;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.langchain4j.mcp.McpToolProvider;

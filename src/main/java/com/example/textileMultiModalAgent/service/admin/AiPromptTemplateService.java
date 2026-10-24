@@ -1,4 +1,4 @@
-package com.example.textileMultiModalAgent.service.ai;
+package com.example.textileMultiModalAgent.service.admin;
 
 import com.baomidou.mybatisplus.spring.service.IService;
 import com.example.textileMultiModalAgent.domain.AiPromptTemplate;

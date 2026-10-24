@@ -7,7 +7,7 @@ import com.example.textileMultiModalAgent.domain.AiBusinessLog;
 import com.example.textileMultiModalAgent.domain.AiChatMessage;
 import com.example.textileMultiModalAgent.domain.SysUser;
 import com.example.textileMultiModalAgent.mapper.SysUserMapper;
-import com.example.textileMultiModalAgent.service.ai.AiBusinessLogService;
+import com.example.textileMultiModalAgent.service.admin.AiBusinessLogService;
 import com.example.textileMultiModalAgent.service.ai.AiChatMessageService;
 import com.example.textileMultiModalAgent.service.ai.AiChatSessionService;
 import com.example.textileMultiModalAgent.service.admin.CallStatisticsService;

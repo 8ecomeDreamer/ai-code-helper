@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.textileMultiModalAgent.common.annotation.RequiresPermissions;
 import com.example.textileMultiModalAgent.common.core.Result;
 import com.example.textileMultiModalAgent.domain.AiKeywordMapping;
-import com.example.textileMultiModalAgent.service.ai.AiKeywordMappingService;
+import com.example.textileMultiModalAgent.service.admin.AiKeywordMappingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;

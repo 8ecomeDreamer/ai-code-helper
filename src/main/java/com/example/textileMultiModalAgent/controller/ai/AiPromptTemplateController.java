@@ -2,7 +2,7 @@ package com.example.textileMultiModalAgent.controller.ai;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.textileMultiModalAgent.domain.AiPromptTemplate;
-import com.example.textileMultiModalAgent.service.ai.AiPromptTemplateService;
+import com.example.textileMultiModalAgent.service.admin.AiPromptTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
