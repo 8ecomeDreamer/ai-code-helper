@@ -24,6 +24,10 @@
         <swagger.version>1.6.14</swagger.version>
         <hutool.version>5.8.26</hutool.version>
         <minio.version>8.5.7</minio.version>
+        <langchain4j-document-parser-apache-poi.version>1.22.0-beta32</langchain4j-document-parser-apache-poi.version>
+        <!-- 与 poi-ooxml 5.5.1 对齐，防止 minio 传递进来的 1.24.0 覆盖 -->
+        <commons-compress.version>1.28.0</commons-compress.version>
+        <commons-io.version>2.21.0</commons-io.version>
     </properties>
     <dependencies>
         <dependency>
@@ -147,6 +151,28 @@
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-document-parser-apache-poi</artifactId>
+            <version>${langchain4j-document-parser-apache-poi.version}</version>
+        </dependency>
+
+        <!-- 显式提升优先级：poi-ooxml 5.5.1 需要 commons-compress >= 1.27.1 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
+        </dependency>
+
+        <!-- langchain4j 的 poi parser 排除了 commons-io，这里补回 poi-ooxml 需要的版本 -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
